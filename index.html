@@ -297,6 +297,7 @@
       word-break:break-word;
     }
 
+
     .wing-card{
       position:relative;
       overflow:hidden;
@@ -776,7 +777,7 @@
       const thickness = +tractionThickness.value;
       const stiffness = +tractionStiffness.value;
 
-      const young = stiffness * 3.2;
+      const young = stiffness * 3.2; // échelle visuelle pseudo-E
       const strain = force / Math.max(young * thickness * 22, 1);
       const disp = strain * 520;
       const stress = (force * 12) / thickness;
@@ -800,10 +801,15 @@
           const xn = i / (cols - 1);
           const yn = j / (rows - 1);
 
+          // allongement axial progressif vers la droite
           const xShift = axialAmp * xn;
+
+          // contraction latérale liée au coefficient de Poisson
           const localHalfHeight = h * 0.5 - lateralAmp * xn;
           const yCenter = y0 + h * 0.5;
           const y = yCenter + (yn - 0.5) * 2 * localHalfHeight;
+
+          // carte de contrainte plus forte à droite
           const local = clamp(0.14 + 0.78 * xn + 0.06 * Math.abs(yn - 0.5), 0, 1);
 
           const x = x0 + i * (w / cols) + xShift;
@@ -998,6 +1004,8 @@
         for (let x = 0; x <= w; x += 8) {
           const top = topWall(x);
           const gap = gapAt(x);
+          const centerBias = 1 - Math.pow(2 * yn - 1, 2);
+          const accel = (2 * entryHalf) / Math.max(gap, 20);
           const wiggle = Math.sin((x / 55) + j * 0.7) * mix * 0.3;
           const y = top + yn * gap + wiggle;
 
@@ -1088,136 +1096,18 @@
       const c1x = 220;
       const c2x = 220 + r1 + r2 - 10;
       const cy = 160;
-      const phase = Date.now() / 900;
-      const thickness = clamp(torque / 22, 3, 8);
-
-      const arm1x = c1x + r1 * 0.68 * Math.cos(phase);
-      const arm1y = cy + r1 * 0.68 * Math.sin(phase);
-      const arm2x = c2x + r2 * 0.68 * Math.cos(-phase * ratio);
-      const arm2y = cy + r2 * 0.68 * Math.sin(-phase * ratio);
-
-      const glowScale = clamp(torque / 120, 0.2, 1);
-      const ringPulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
-
-      let sparks = '';
-      for (let i = 0; i < 10; i++) {
-        const a = phase + i * (Math.PI * 2 / 10);
-        const sx = c1x + (r1 + 16 + Math.sin(Date.now()/300 + i) * 4) * Math.cos(a);
-        const sy = cy + (r1 + 16 + Math.sin(Date.now()/300 + i) * 4) * Math.sin(a);
-        sparks += `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(1.8 + ringPulse * 1.8).toFixed(1)}" fill="rgba(56,189,248,0.55)" />`;
-      }
-
-      for (let i = 0; i < 12; i++) {
-        const a = -phase * ratio + i * (Math.PI * 2 / 12);
-        const sx = c2x + (r2 + 18 + Math.cos(Date.now()/340 + i) * 4) * Math.cos(a);
-        const sy = cy + (r2 + 18 + Math.cos(Date.now()/340 + i) * 4) * Math.sin(a);
-        sparks += `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(1.6 + ringPulse * 1.5).toFixed(1)}" fill="rgba(139,92,246,0.50)" />`;
-      }
+      const phase = Date.now() / 800;
+      const thickness = clamp(torque / 20, 2, 8);
 
       svg.innerHTML = `
-        <defs>
-          <radialGradient id="gearBgGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="rgba(56,189,248,0.10)" />
-            <stop offset="55%" stop-color="rgba(139,92,246,0.08)" />
-            <stop offset="100%" stop-color="rgba(15,23,42,0)" />
-          </radialGradient>
-
-          <radialGradient id="gear1Fill" cx="35%" cy="30%" r="70%">
-            <stop offset="0%" stop-color="rgba(125,211,252,0.95)" />
-            <stop offset="45%" stop-color="rgba(56,189,248,0.45)" />
-            <stop offset="100%" stop-color="rgba(14,116,144,0.18)" />
-          </radialGradient>
-
-          <radialGradient id="gear2Fill" cx="35%" cy="30%" r="70%">
-            <stop offset="0%" stop-color="rgba(216,180,254,0.95)" />
-            <stop offset="45%" stop-color="rgba(139,92,246,0.42)" />
-            <stop offset="100%" stop-color="rgba(91,33,182,0.16)" />
-          </radialGradient>
-
-          <linearGradient id="gearLink" x1="0" x2="1">
-            <stop offset="0%" stop-color="rgba(56,189,248,0.25)" />
-            <stop offset="50%" stop-color="rgba(255,255,255,0.12)" />
-            <stop offset="100%" stop-color="rgba(139,92,246,0.25)" />
-          </linearGradient>
-
-          <filter id="gearGlowBlue">
-            <feGaussianBlur stdDeviation="${4 + glowScale * 4}" result="blur"/>
-          </filter>
-
-          <filter id="gearGlowPurple">
-            <feGaussianBlur stdDeviation="${4 + glowScale * 4}" result="blur"/>
-          </filter>
-        </defs>
-
-        <rect x="20" y="24" width="660" height="272" rx="24"
-              fill="rgba(255,255,255,0.025)"
-              stroke="rgba(255,255,255,0.06)" />
-
-        <ellipse cx="350" cy="160" rx="260" ry="120" fill="url(#gearBgGlow)" />
-
-        <line x1="${c1x}" y1="${cy}" x2="${c2x}" y2="${cy}"
-              stroke="url(#gearLink)" stroke-width="8" opacity="0.35" />
-
-        <circle cx="${c1x}" cy="${cy}" r="${r1 + 16}"
-                fill="rgba(56,189,248,0.10)"
-                filter="url(#gearGlowBlue)" />
-
-        <circle cx="${c2x}" cy="${cy}" r="${r2 + 16}"
-                fill="rgba(139,92,246,0.10)"
-                filter="url(#gearGlowPurple)" />
-
-        ${sparks}
-
-        <path d="${gearPath(c1x, cy, r1, z1, phase)}"
-              fill="url(#gear1Fill)"
-              stroke="#7dd3fc"
-              stroke-width="${thickness}"
-              filter="url(#gearGlowBlue)" />
-
-        <path d="${gearPath(c1x, cy, r1, z1, phase)}"
-              fill="none"
-              stroke="rgba(255,255,255,0.55)"
-              stroke-width="1.4" />
-
-        <path d="${gearPath(c2x, cy, r2, z2, -phase * ratio)}"
-              fill="url(#gear2Fill)"
-              stroke="#c4b5fd"
-              stroke-width="${thickness}"
-              filter="url(#gearGlowPurple)" />
-
-        <path d="${gearPath(c2x, cy, r2, z2, -phase * ratio)}"
-              fill="none"
-              stroke="rgba(255,255,255,0.48)"
-              stroke-width="1.4" />
-
-        <circle cx="${c1x}" cy="${cy}" r="${r1 * 0.64}"
-                fill="rgba(15,23,42,0.55)"
-                stroke="rgba(255,255,255,0.16)"
-                stroke-width="2" />
-
-        <circle cx="${c2x}" cy="${cy}" r="${r2 * 0.64}"
-                fill="rgba(15,23,42,0.55)"
-                stroke="rgba(255,255,255,0.16)"
-                stroke-width="2" />
-
-        <circle cx="${c1x}" cy="${cy}" r="14" fill="#f8fafc" />
-        <circle cx="${c2x}" cy="${cy}" r="14" fill="#f8fafc" />
-
-        <line x1="${c1x}" y1="${cy}" x2="${arm1x.toFixed(1)}" y2="${arm1y.toFixed(1)}"
-              stroke="#e0f2fe" stroke-width="4.5" stroke-linecap="round" />
-
-        <line x1="${c2x}" y1="${cy}" x2="${arm2x.toFixed(1)}" y2="${arm2y.toFixed(1)}"
-              stroke="#ede9fe" stroke-width="4.5" stroke-linecap="round" />
-
-        <circle cx="${c1x}" cy="${cy}" r="${r1 + 7}"
-                fill="none"
-                stroke="rgba(125,211,252,${(0.14 + ringPulse * 0.16).toFixed(2)})"
-                stroke-width="2" />
-
-        <circle cx="${c2x}" cy="${cy}" r="${r2 + 7}"
-                fill="none"
-                stroke="rgba(196,181,253,${(0.14 + ringPulse * 0.16).toFixed(2)})"
-                stroke-width="2" />
+        <path d="${gearPath(c1x, cy, r1, z1, phase)}" fill="rgba(56,189,248,0.16)" stroke="#38bdf8" stroke-width="${thickness}" />
+        <path d="${gearPath(c2x, cy, r2, z2, -phase * ratio)}" fill="rgba(139,92,246,0.16)" stroke="#8b5cf6" stroke-width="${thickness}" />
+        <circle cx="${c1x}" cy="${cy}" r="16" fill="#e2e8f0" />
+        <circle cx="${c2x}" cy="${cy}" r="16" fill="#e2e8f0" />
+        <line x1="${c1x}" y1="${cy}" x2="${c1x + r1 * 0.7 * Math.cos(phase)}" y2="${cy + r1 * 0.7 * Math.sin(phase)}" stroke="#f8fafc" stroke-width="4" />
+        <line x1="${c2x}" y1="${cy}" x2="${c2x + r2 * 0.7 * Math.cos(-phase * ratio)}" y2="${cy + r2 * 0.7 * Math.sin(-phase * ratio)}" stroke="#f8fafc" stroke-width="4" />
+        <text x="70" y="40" fill="#e2e8f0" font-size="18">Transmission par engrenages</text>
+        <text x="70" y="285" fill="#94a3b8" font-size="16">Le pignon de sortie tourne plus lentement si son nombre de dents augmente.</text>
       `;
 
       requestAnimationFrame(drawGears);
@@ -1237,6 +1127,7 @@
 
       const ideal = omega * r;
       const rawSlip = Math.abs(v - ideal) / Math.max(v, ideal, 0.001);
+      const contactGrip = clamp(0.35 + mu * 0.85, 0.35, 1.2);
       const effectiveSlip = rawSlip * (1.2 - 0.55 * mu);
       const slipPct = effectiveSlip * 100;
       const mode = v <= ideal
@@ -1304,12 +1195,16 @@
       requestAnimationFrame(drawRolling);
     }
 
+
     const wingSpeed = bindValue('wingSpeed', v => `${Number(v).toFixed(0)} m/s`);
     const wingAoA = bindValue('wingAoA', v => `${Number(v).toFixed(1).replace('.0','')}°`);
     const wingCamber = bindValue('wingCamber', v => `${Number(v).toFixed(1).replace('.0','')} %`);
     const wingArea = bindValue('wingArea', v => `${v} m²`);
 
-    function drawWing() {
+
+    
+
+function drawWing() {
       const svg = document.getElementById('wingSvg');
       const speed = +wingSpeed.value;
       const aoa = +wingAoA.value;
@@ -1597,6 +1492,7 @@
         <text x="42" y="284" fill="${deepLowAngle ? '#fda4af' : isStall ? '#fdba74' : '#a5f3fc'}" font-size="13.5">${stateText}</text>
       `;
     }
+
 
     let wingAnimationStarted = false;
 
