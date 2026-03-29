@@ -1,1535 +1,272 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio MAM - Simulations Interactives</title>
+<script>
+function drawCFD() {
+  const canvas = document.getElementById('cfdCanvas');
+  const ctx = canvas.getContext('2d');
 
-  <style>
-    :root{
-      --bg-1:#030712;
-      --bg-2:#0f172a;
-      --bg-3:#111827;
-      --panel:rgba(15,23,42,0.72);
-      --panel-strong:rgba(15,23,42,0.82);
-      --card:rgba(17,24,39,0.76);
-      --text:#e5eefc;
-      --muted:#94a3b8;
-      --accent:#38bdf8;
-      --accent-2:#8b5cf6;
-      --border:rgba(255,255,255,0.08);
-      --shadow:0 18px 50px rgba(0,0,0,0.35);
-      --radius:22px;
-      --radius-sm:16px;
+  const flow = +cfdSpeed.value;
+  const neck = +cfdViscosity.value;
+  const channelH = +cfdObstacle.value;
+  const mix = +cfdTurbulence.value;
+
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const topBase = 60;
+  const cx = w * 0.5;
+  const throatHalf = 50 - neck * 3;
+  const entryHalf = channelH + 35;
+
+  const topWall = (x) => {
+    const d = Math.abs(x - cx) / 170;
+    const smooth = Math.exp(-d * d);
+    return topBase + (entryHalf - throatHalf) * smooth;
+  };
+
+  const bottomWall = (x) => h - topWall(x);
+  const gapAt = (x) => bottomWall(x) - topWall(x);
+
+  // fond plus propre
+  const bg = ctx.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, 'rgba(8,15,32,1)');
+  bg.addColorStop(0.5, 'rgba(10,20,42,1)');
+  bg.addColorStop(1, 'rgba(5,10,25,1)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+
+  // halo central léger
+  const glow = ctx.createRadialGradient(cx, h / 2, 20, cx, h / 2, 240);
+  glow.addColorStop(0, 'rgba(56,189,248,0.08)');
+  glow.addColorStop(1, 'rgba(56,189,248,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+
+  // parois
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  for (let x = 0; x <= w; x += 8) ctx.lineTo(x, topWall(x));
+  ctx.lineTo(w, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  for (let x = 0; x <= w; x += 8) ctx.lineTo(x, bottomWall(x));
+  ctx.lineTo(w, h);
+  ctx.closePath();
+  ctx.fill();
+
+  // contour plus doux
+  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+  ctx.lineWidth = 2.5;
+
+  ctx.beginPath();
+  for (let x = 0; x <= w; x += 4) {
+    const y = topWall(x);
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  ctx.beginPath();
+  for (let x = 0; x <= w; x += 4) {
+    const y = bottomWall(x);
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // petites lignes de grille très discrètes
+  ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+  ctx.lineWidth = 1;
+  for (let gy = 40; gy <= h - 40; gy += 30) {
+    ctx.beginPath();
+    ctx.moveTo(30, gy);
+    ctx.lineTo(w - 30, gy);
+    ctx.stroke();
+  }
+
+  // lignes d'écoulement plus propres
+  for (let j = 0; j < 16; j++) {
+    const yn = j / 15;
+    ctx.beginPath();
+
+    for (let x = 0; x <= w; x += 8) {
+      const top = topWall(x);
+      const gap = gapAt(x);
+      const centerBias = 1 - Math.pow(2 * yn - 1, 2);
+      const accel = (2 * entryHalf) / Math.max(gap, 20);
+      const wiggle = Math.sin((x / 65) + j * 0.75 + Date.now() * 0.0015 * mix) * mix * 0.22;
+      const y = top + yn * gap + wiggle * (0.35 + centerBias * 0.65);
+
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     }
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      margin:0;
-      font-family:Inter, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.16), transparent 28%),
-        radial-gradient(circle at top right, rgba(167,139,250,0.14), transparent 25%),
-        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
-      min-height:100vh;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(rgba(255,255,255,0.02), rgba(255,255,255,0.01)),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,0.018) 0px,
-          rgba(255,255,255,0.018) 1px,
-          transparent 1px,
-          transparent 22px
-        );
-      z-index:0;
-    }
-
-    .page{
-      position:relative;
-      z-index:1;
-    }
-
-    header{
-      max-width:1280px;
-      margin:0 auto;
-      padding:42px 18px 18px;
-      text-align:center;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 16px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.72);
-      border:1px solid rgba(56,189,248,0.24);
-      color:#bae6fd;
-      box-shadow:0 10px 25px rgba(56,189,248,0.08);
-      font-size:0.92rem;
-      font-weight:600;
-      margin-bottom:16px;
-      backdrop-filter:blur(10px);
-    }
-
-    header h1{
-      margin:0 0 14px;
-      font-size:clamp(2rem, 5vw, 3.8rem);
-      line-height:1.05;
-      letter-spacing:-0.03em;
-    }
-
-    header p{
-      margin:0 auto;
-      max-width:920px;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.65;
-    }
-
-    .container{
-      max-width:1280px;
-      margin:0 auto;
-      padding:20px 14px 60px;
-      display:grid;
-      gap:22px;
-    }
-
-    .intro{
-      display:grid;
-      grid-template-columns:1.2fr 0.8fr;
-      gap:18px;
-      padding:22px;
-      border-radius:var(--radius);
-      background:var(--panel);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(14px);
-    }
-
-    .intro h2{
-      margin:0;
-      font-size:1.35rem;
-    }
-
-    .intro p{
-      margin:10px 0 0;
-      color:var(--muted);
-      line-height:1.7;
-    }
-
-    .legend{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:12px;
-      padding:16px;
-      border-radius:18px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.06);
-    }
-
-    .legend-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .legend strong{
-      font-size:1rem;
-    }
-
-    .legend-bar{
-      width:100%;
-      height:14px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #1d4ed8, #22d3ee, #facc15, #f97316, #dc2626);
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow:inset 0 1px 4px rgba(255,255,255,0.12);
-    }
-
-    .legend span{
-      color:var(--muted);
-      font-size:0.95rem;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:22px;
-    }
-
-    .card{
-      display:grid;
-      grid-template-rows:auto auto 1fr;
-      overflow:hidden;
-      border-radius:var(--radius);
-      background:var(--card);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(14px);
-      transition:transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover{
-      transform:translateY(-2px);
-      box-shadow:0 22px 55px rgba(0,0,0,0.42);
-    }
-
-    .card-header{
-      padding:22px 20px 10px;
-    }
-
-    .card-header h2{
-      margin:0 0 8px;
-      font-size:1.22rem;
-      line-height:1.3;
-    }
-
-    .card-header p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.55;
-      font-size:0.96rem;
-    }
-
-    .controls{
-      padding:16px 20px 14px;
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:14px 16px;
-      background:rgba(255,255,255,0.03);
-      border-top:1px solid rgba(255,255,255,0.05);
-      border-bottom:1px solid rgba(255,255,255,0.05);
-    }
-
-    .control{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      min-width:0;
-    }
-
-    .control label{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      font-size:0.93rem;
-      font-weight:600;
-      color:#dbeafe;
-      line-height:1.4;
-    }
-
-    .control label span{
-      color:#7dd3fc;
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    input[type="range"]{
-      width:100%;
-      cursor:pointer;
-      accent-color:var(--accent);
-    }
-
-    .stage{
-      padding:18px;
-      display:grid;
-      gap:12px;
-    }
-
-    .stage svg,
-    .stage canvas{
-      width:100%;
-      height:360px;
-      display:block;
-      border-radius:18px;
-      background:
-        radial-gradient(circle at top, rgba(56,189,248,0.10), rgba(15,23,42,0.38)),
-        linear-gradient(180deg, rgba(15,23,42,0.82), rgba(2,6,23,0.96));
-      border:1px solid rgba(255,255,255,0.06);
-    }
-
-    .metrics{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:10px;
-    }
-
-    .metric{
-      padding:13px 12px;
-      border-radius:16px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.06);
-      min-width:0;
-    }
-
-    .metric span{
-      display:block;
-      color:var(--muted);
-      font-size:0.84rem;
-      margin-bottom:4px;
-      line-height:1.35;
-    }
-
-    .metric strong{
-      display:block;
-      font-size:1rem;
-      line-height:1.35;
-      word-break:break-word;
-    }
-
-
-    .wing-card{
-      position:relative;
-      overflow:hidden;
-    }
-
-    .wing-card::before{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(56,189,248,0.20), transparent 24%),
-        radial-gradient(circle at 82% 24%, rgba(139,92,246,0.16), transparent 28%),
-        linear-gradient(135deg, rgba(56,189,248,0.10), transparent 35%, rgba(139,92,246,0.10) 70%, transparent 100%);
-      opacity:1;
-    }
-
-    footer{
-      max-width:1280px;
-      margin:0 auto;
-      padding:0 18px 56px;
-      color:var(--muted);
-      font-size:0.94rem;
-      line-height:1.7;
-      text-align:center;
-    }
-
-    @media (max-width: 1024px){
-      .intro{
-        grid-template-columns:1fr;
-      }
-
-      .grid{
-        grid-template-columns:1fr;
-      }
-
-      .stage svg,
-      .stage canvas{
-        height:320px;
-      }
-    }
-
-    @media (max-width: 768px){
-      header{
-        padding:28px 14px 12px;
-      }
-
-      .container{
-        padding:14px 10px 36px;
-        gap:16px;
-      }
-
-      .intro,
-      .card{
-        border-radius:18px;
-      }
-
-      .intro{
-        padding:16px;
-      }
-
-      .card-header{
-        padding:16px 14px 8px;
-      }
-
-      .controls{
-        grid-template-columns:1fr;
-        padding:14px;
-      }
-
-      .stage{
-        padding:14px;
-      }
-
-      .metrics{
-        grid-template-columns:1fr;
-      }
-
-      .stage svg,
-      .stage canvas{
-        height:270px;
-      }
-
-      .card-header h2{
-        font-size:1.08rem;
-      }
-
-      .card-header p,
-      .intro p,
-      header p{
-        font-size:0.94rem;
-      }
-    }
-
-    @media (max-width: 480px){
-      .badge{
-        font-size:0.8rem;
-        padding:8px 12px;
-      }
-
-      header h1{
-        font-size:1.75rem;
-      }
-
-      .control label{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-
-      .control label span{
-        white-space:normal;
-      }
-
-      .stage svg,
-      .stage canvas{
-        height:240px;
-        border-radius:14px;
-      }
-
-      .metric strong{
-        font-size:0.95rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <header>
-      <div class="badge">Portfolio interactif • Master MAM • UCBL Lyon 1</div>
-      <h1>Simulations mécaniques et fluides</h1>
-    </header>
-
-    <main class="container">
-      <section class="intro">
-        <div>
-          <h2>À propos</h2>
-        </div>
-
-        <div class="legend">
-          <div class="legend-top">
-            <strong>Échelle visuelle</strong>
-          </div>
-          <div class="legend-bar"></div>
-          <span>faible → forte intensité</span>
-        </div>
-      </section>
-
-      <section class="grid">
-
-        <article class="card">
-          <div class="card-header">
-            <h2>1. Traction / vibration de plaque</h2>
-            <p>Augmente la force ou la fréquence pour voir la déformation et la concentration des contraintes.</p>
-          </div>
-
-          <div class="controls">
-            <div class="control">
-              <label>Force <span id="tractionForceValue">45 kN</span></label>
-              <input id="tractionForce" type="range" min="5" max="100" value="45" />
-            </div>
-
-            <div class="control">
-              <label>Coeff. de Poisson ν <span id="tractionPoissonValue">0.30</span></label>
-              <input id="tractionPoisson" type="range" min="0" max="0.45" step="0.01" value="0.30" />
-            </div>
-
-            <div class="control">
-              <label>Épaisseur <span id="tractionThicknessValue">18 mm</span></label>
-              <input id="tractionThickness" type="range" min="8" max="30" value="18" />
-            </div>
-
-            <div class="control">
-              <label>Rigidité matière <span id="tractionStiffnessValue">60</span></label>
-              <input id="tractionStiffness" type="range" min="20" max="100" value="60" />
-            </div>
-          </div>
-
-          <div class="stage">
-            <svg id="tractionSvg" viewBox="0 0 700 320"></svg>
-            <div class="metrics">
-              <div class="metric">
-                <span>Déplacement max</span>
-                <strong id="tractionDisp">0 mm</strong>
-              </div>
-              <div class="metric">
-                <span>Contrainte estimée</span>
-                <strong id="tractionStress">0 MPa</strong>
-              </div>
-              <div class="metric">
-                <span>Mode visuel</span>
-                <strong>Carte couleur + déformée</strong>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-header">
-            <h2>2. Flexion de poutre</h2>
-            <p>Modifie la charge et la longueur utile de la poutre pour visualiser la flèche et la zone critique.</p>
-          </div>
-
-          <div class="controls">
-            <div class="control">
-              <label>Charge <span id="beamLoadValue">30 kN</span></label>
-              <input id="beamLoad" type="range" min="5" max="80" value="30" />
-            </div>
-
-            <div class="control">
-              <label>Longueur de la poutre <span id="beamSpanValue">4.0 m</span></label>
-              <input id="beamSpan" type="range" min="2" max="8" step="0.1" value="4" />
-            </div>
-
-            <div class="control">
-              <label>Hauteur section <span id="beamHeightValue">220 mm</span></label>
-              <input id="beamHeight" type="range" min="120" max="400" value="220" />
-            </div>
-
-            <div class="control">
-              <label>Module E <span id="beamYoungValue">75 GPa</span></label>
-              <input id="beamYoung" type="range" min="20" max="210" value="75" />
-            </div>
-          </div>
-
-          <div class="stage">
-            <svg id="beamSvg" viewBox="0 0 700 320"></svg>
-            <div class="metrics">
-              <div class="metric">
-                <span>Flèche max</span>
-                <strong id="beamDeflection">0 mm</strong>
-              </div>
-              <div class="metric">
-                <span>Moment max</span>
-                <strong id="beamMoment">0 kN·m</strong>
-              </div>
-              <div class="metric">
-                <span>Zone critique</span>
-                <strong id="beamCritical">Milieu de travée</strong>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-header">
-            <h2>3. Écoulement dans un canal</h2>
-            <p>Le fluide traverse un rétrécissement : quand la section diminue, la vitesse augmente.</p>
-          </div>
-
-          <div class="controls">
-            <div class="control">
-              <label>Débit <span id="cfdSpeedValue">3.0 m/s</span></label>
-              <input id="cfdSpeed" type="range" min="1" max="10" step="0.1" value="3" />
-            </div>
-
-            <div class="control">
-              <label>Rétrécissement <span id="cfdViscosityValue">5</span></label>
-              <input id="cfdViscosity" type="range" min="1" max="10" value="5" />
-            </div>
-
-            <div class="control">
-              <label>Hauteur canal <span id="cfdObstacleValue">60 mm</span></label>
-              <input id="cfdObstacle" type="range" min="40" max="120" value="60" />
-            </div>
-
-            <div class="control">
-              <label>Mélange <span id="cfdTurbulenceValue">4</span></label>
-              <input id="cfdTurbulence" type="range" min="1" max="10" value="4" />
-            </div>
-          </div>
-
-          <div class="stage">
-            <canvas id="cfdCanvas" width="700" height="320"></canvas>
-            <div class="metrics">
-              <div class="metric">
-                <span>Vitesse max</span>
-                <strong id="cfdRe">0</strong>
-              </div>
-              <div class="metric">
-                <span>Zone rapide</span>
-                <strong id="cfdWake">Centre</strong>
-              </div>
-              <div class="metric">
-                <span>Lecture</span>
-                <strong>Bleu lent → rouge rapide</strong>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-header">
-            <h2>4. Engrenages</h2>
-            <p>Module interactif pour montrer le rapport de transmission et la vitesse relative.</p>
-          </div>
-
-          <div class="controls">
-            <div class="control">
-              <label>Dents pignon 1 <span id="gear1TeethValue">18</span></label>
-              <input id="gear1Teeth" type="range" min="10" max="40" value="18" />
-            </div>
-
-            <div class="control">
-              <label>Dents pignon 2 <span id="gear2TeethValue">36</span></label>
-              <input id="gear2Teeth" type="range" min="12" max="80" value="36" />
-            </div>
-
-            <div class="control">
-              <label>Vitesse entrée <span id="gearSpeedValue">180 rpm</span></label>
-              <input id="gearSpeed" type="range" min="60" max="600" value="180" />
-            </div>
-
-            <div class="control">
-              <label>Couple visuel <span id="gearTorqueValue">45 N·m</span></label>
-              <input id="gearTorque" type="range" min="10" max="120" value="45" />
-            </div>
-          </div>
-
-          <div class="stage">
-            <svg id="gearSvg" viewBox="0 0 700 320"></svg>
-            <div class="metrics">
-              <div class="metric">
-                <span>Rapport</span>
-                <strong id="gearRatio">0</strong>
-              </div>
-              <div class="metric">
-                <span>Vitesse sortie</span>
-                <strong id="gearOutput">0 rpm</strong>
-              </div>
-              <div class="metric">
-                <span>Sens</span>
-                <strong>Inverse</strong>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-header">
-            <h2>5. Roulement : glissement / sans glissement</h2>
-            <p>Visualise la différence entre roulement pur et roulement avec glissement. Ici, le frottement modifie directement la zone de contact et atténue ou accentue le glissement observé.</p>
-          </div>
-
-          <div class="controls">
-            <div class="control">
-              <label>Vitesse translation <span id="rollSpeedValue">3.0 m/s</span></label>
-              <input id="rollSpeed" type="range" min="0.5" max="8" step="0.1" value="3" />
-            </div>
-
-            <div class="control">
-              <label>Vitesse angulaire <span id="rollOmegaValue">6.0 rad/s</span></label>
-              <input id="rollOmega" type="range" min="1" max="16" step="0.1" value="6" />
-            </div>
-
-            <div class="control">
-              <label>Rayon roue <span id="rollRadiusValue">0.50 m</span></label>
-              <input id="rollRadius" type="range" min="0.2" max="1.0" step="0.01" value="0.5" />
-            </div>
-
-            <div class="control">
-              <label>Frottement <span id="rollFrictionValue">0.45</span></label>
-              <input id="rollFriction" type="range" min="0.05" max="1" step="0.01" value="0.45" />
-            </div>
-          </div>
-
-          <div class="stage">
-            <svg id="rollSvg" viewBox="0 0 700 320"></svg>
-            <div class="metrics">
-              <div class="metric">
-                <span>Taux de glissement</span>
-                <strong id="rollSlip">0 %</strong>
-              </div>
-              <div class="metric">
-                <span>État de contact</span>
-                <strong id="rollMode">Sans glissement</strong>
-              </div>
-              <div class="metric">
-                <span>Lecture</span>
-                <strong>Contact roue-sol</strong>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="card wing-card">
-          <div class="card-header">
-            <h2>6. Aile d’avion : portance et angle d’attaque</h2>
-            <p>Module final plus visuel pour montrer l’effet de la vitesse, de l’angle d’attaque et du profil sur la portance et le risque de décrochage.</p>
-          </div>
-
-          <div class="controls">
-            <div class="control">
-              <label>Vitesse de l’air <span id="wingSpeedValue">65 m/s</span></label>
-              <input id="wingSpeed" type="range" min="20" max="120" step="1" value="65" />
-            </div>
-
-            <div class="control">
-              <label>Angle d’attaque <span id="wingAoAValue">8°</span></label>
-              <input id="wingAoA" type="range" min="-4" max="20" step="0.5" value="8" />
-            </div>
-
-            <div class="control">
-              <label>Cambrure du profil <span id="wingCamberValue">6 %</span></label>
-              <input id="wingCamber" type="range" min="0" max="12" step="0.5" value="6" />
-            </div>
-
-            <div class="control">
-              <label>Surface alaire <span id="wingAreaValue">24 m²</span></label>
-              <input id="wingArea" type="range" min="8" max="40" step="1" value="24" />
-            </div>
-          </div>
-
-          <div class="stage">
-            <svg id="wingSvg" viewBox="0 0 700 320"></svg>
-            <div class="metrics">
-              <div class="metric">
-                <span>Portance estimée</span>
-                <strong id="wingLift">0 kN</strong>
-              </div>
-              <div class="metric">
-                <span>Coefficient de portance</span>
-                <strong id="wingCl">0.00</strong>
-              </div>
-              <div class="metric">
-                <span>État aérodynamique</span>
-                <strong id="wingState">Écoulement attaché</strong>
-              </div>
-            </div>
-          </div>
-        </article>
-
-      </section>
-    </main>
-
-    <footer></footer>
-  </div>
-
-  <script>
-    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-    const colorMap = (t) => {
-      const c1 = [29, 78, 216];
-      const c2 = [34, 211, 238];
-      const c3 = [250, 204, 21];
-      const c4 = [249, 115, 22];
-      const c5 = [220, 38, 38];
-
-      const mix = (a, b, u) => a.map((x, i) => Math.round(x + (b[i] - x) * u));
-
-      let c;
-      if (t < 0.25) c = mix(c1, c2, t / 0.25);
-      else if (t < 0.5) c = mix(c2, c3, (t - 0.25) / 0.25);
-      else if (t < 0.75) c = mix(c3, c4, (t - 0.5) / 0.25);
-      else c = mix(c4, c5, (t - 0.75) / 0.25);
-
-      return `rgb(${c[0]},${c[1]},${c[2]})`;
-    };
-
-    function bindValue(id, format = v => v) {
-      const input = document.getElementById(id);
-      const out = document.getElementById(id + 'Value');
-      const update = () => out.textContent = format(input.value);
-      input.addEventListener('input', update);
-      update();
-      return input;
-    }
-
-    const tractionForce = bindValue('tractionForce', v => `${v} kN`);
-    const tractionPoisson = bindValue('tractionPoisson', v => Number(v).toFixed(2));
-    const tractionThickness = bindValue('tractionThickness', v => `${v} mm`);
-    const tractionStiffness = bindValue('tractionStiffness', v => `${v}`);
-
-    function drawTraction() {
-      const svg = document.getElementById('tractionSvg');
-      const force = +tractionForce.value;
-      const nu = +tractionPoisson.value;
-      const thickness = +tractionThickness.value;
-      const stiffness = +tractionStiffness.value;
-
-      const young = stiffness * 3.2; // échelle visuelle pseudo-E
-      const strain = force / Math.max(young * thickness * 22, 1);
-      const disp = strain * 520;
-      const stress = (force * 12) / thickness;
-
-      document.getElementById('tractionDisp').textContent = `${disp.toFixed(2)} mm`;
-      document.getElementById('tractionStress').textContent = `${stress.toFixed(1)} MPa`;
-
-      let rects = '';
-      const cols = 36;
-      const rows = 11;
-      const x0 = 110;
-      const y0 = 72;
-      const w = 430;
-      const h = 136;
-
-      const axialAmp = clamp(disp * 12.5, 8, 62);
-      const lateralAmp = clamp(axialAmp * nu * 0.58, 0, 16);
-
-      for (let j = 0; j < rows; j++) {
-        for (let i = 0; i < cols; i++) {
-          const xn = i / (cols - 1);
-          const yn = j / (rows - 1);
-
-          // allongement axial progressif vers la droite
-          const xShift = axialAmp * xn;
-
-          // contraction latérale liée au coefficient de Poisson
-          const localHalfHeight = h * 0.5 - lateralAmp * xn;
-          const yCenter = y0 + h * 0.5;
-          const y = yCenter + (yn - 0.5) * 2 * localHalfHeight;
-
-          // carte de contrainte plus forte à droite
-          const local = clamp(0.14 + 0.78 * xn + 0.06 * Math.abs(yn - 0.5), 0, 1);
-
-          const x = x0 + i * (w / cols) + xShift;
-          rects += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(w/cols+0.9).toFixed(1)}" height="${(2*localHalfHeight/rows+0.9).toFixed(1)}" fill="${colorMap(local)}" opacity="0.95"/>`;
-        }
-      }
-
-      const centerY = y0 + h / 2;
-      const arrowLen = clamp(75 + force * 1.0, 90, 170);
-      const faceX = x0 + w + axialAmp;
-
-      svg.innerHTML = `
-        <defs>
-          <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-            <path d="M0,0 L12,6 L0,12 z" fill="#e2e8f0"></path>
-          </marker>
-        </defs>
-
-        <rect x="60" y="55" width="26" height="170" rx="6" fill="#64748b" />
-        <rect x="${x0-3}" y="${y0-6}" width="${w + axialAmp + 10}" height="${h+12}" rx="10" fill="none" stroke="rgba(255,255,255,0.16)" />
-        ${rects}
-
-        <line x1="${faceX}" y1="${centerY}"
-              x2="${faceX + arrowLen}" y2="${centerY}"
-              stroke="#e2e8f0" stroke-width="6"
-              marker-end="url(#arrowHead)" />
-        <text x="${faceX + 22}" y="${centerY - 24}" fill="#e2e8f0" font-size="18">Force</text>
-        <text x="60" y="265" fill="#94a3b8" font-size="16">Traction statique : allongement axial et contraction latérale de Poisson</text>
-      `;
-    }
-
-    const beamLoad = bindValue('beamLoad', v => `${v} kN`);
-    const beamSpan = bindValue('beamSpan', v => `${Number(v).toFixed(1)} m`);
-    const beamHeight = bindValue('beamHeight', v => `${v} mm`);
-    const beamYoung = bindValue('beamYoung', v => `${v} GPa`);
-
-    function drawBeam() {
-      const svg = document.getElementById('beamSvg');
-      const P = +beamLoad.value;
-      const L = +beamSpan.value;
-      const h = +beamHeight.value;
-      const E = +beamYoung.value;
-
-      const delta = (P * Math.pow(L, 3)) / (E * Math.pow(h / 100, 3) * 20);
-      const M = (P * L) / 4;
-      const effortLevel = clamp((P / 80) * (4.5 / L) * (220 / h) * (120 / E), 0, 1);
-
-      document.getElementById('beamDeflection').textContent = `${delta.toFixed(2)} mm`;
-      document.getElementById('beamMoment').textContent = `${M.toFixed(1)} kN·m`;
-
-      const startX = 80;
-      const endX = 620;
-      const baseY = 135;
-      const amp = clamp(delta * 10, 12, 95);
-
-      let path = `M ${startX} ${baseY}`;
-      let bands = '';
-      let glowBands = '';
-      let grid = '';
-
-      for (let i = 0; i <= 80; i++) {
-        const t = i / 80;
-        const x = startX + (endX - startX) * t;
-        const y = baseY + amp * Math.sin(Math.PI * t);
-        path += ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
-      }
-
-      for (let i = 0; i <= 12; i++) {
-        const y = 54 + i * 18;
-        grid += `<line x1="34" y1="${y}" x2="666" y2="${y}" stroke="rgba(255,255,255,0.035)" stroke-width="1" />`;
-      }
-
-      for (let i = 0; i < 44; i++) {
-        const t = i / 43;
-        const x = startX + (endX - startX) * t;
-        const stressShape = Math.sin(Math.PI * t);
-        const level = clamp(0.18 + 0.82 * stressShape * (0.45 + effortLevel * 0.75), 0, 1);
-        const c = colorMap(level);
-        const y = baseY + amp * Math.sin(Math.PI * t);
-        const localHeight = 18 + effortLevel * 14 + stressShape * 10;
-        bands += `<rect x="${x-7}" y="${y - localHeight/2}" width="16" height="${localHeight.toFixed(1)}" fill="${c}" rx="5" opacity="0.96"/>`;
-        glowBands += `<rect x="${x-11}" y="${y - localHeight/2 - 4}" width="24" height="${(localHeight + 8).toFixed(1)}" fill="${c}" rx="8" opacity="${(0.08 + 0.13 * effortLevel).toFixed(2)}"/>`;
-      }
-
-      const beamTint = colorMap(clamp(0.22 + effortLevel * 0.78, 0, 1));
-      const criticalText = effortLevel < 0.32 ? 'Effort faible' : effortLevel < 0.62 ? 'Effort moyen' : effortLevel < 0.85 ? 'Effort élevé' : 'Zone très sollicitée';
-
-      document.getElementById('beamCritical').textContent = criticalText;
-
-      svg.innerHTML = `
-        <defs>
-          <linearGradient id="beamStroke" x1="0" x2="1">
-            <stop offset="0%" stop-color="${colorMap(clamp(0.10 + effortLevel * 0.25, 0, 1))}" />
-            <stop offset="50%" stop-color="${colorMap(clamp(0.45 + effortLevel * 0.35, 0, 1))}" />
-            <stop offset="100%" stop-color="${colorMap(clamp(0.10 + effortLevel * 0.25, 0, 1))}" />
-          </linearGradient>
-          <filter id="beamGlow">
-            <feGaussianBlur stdDeviation="7" result="blur" />
-          </filter>
-        </defs>
-        <rect x="24" y="28" width="652" height="264" rx="20" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" />
-        ${grid}
-        <polygon points="70,190 95,190 82.5,210" fill="#64748b" />
-        <polygon points="605,190 630,190 617.5,210" fill="#64748b" />
-        <line x1="80" y1="190" x2="620" y2="190" stroke="rgba(148,163,184,0.6)" stroke-width="2" stroke-dasharray="5 6" />
-        <path d="${path}" fill="none" stroke="${beamTint}" stroke-width="18" stroke-linecap="round" opacity="0.16" filter="url(#beamGlow)" />
-        ${glowBands}
-        ${bands}
-        <path d="${path}" fill="none" stroke="url(#beamStroke)" stroke-width="10" stroke-linecap="round" />
-        <line x1="350" y1="35" x2="350" y2="105" stroke="#f8fafc" stroke-width="5" />
-        <polygon points="340,95 360,95 350,115" fill="#f8fafc" />
-        <text x="322" y="28" fill="#f8fafc" font-size="18">Charge</text>
-        <text x="84" y="54" fill="#cbd5e1" font-size="13">Couleur liée à l'effort : bleu faible → rouge intense</text>
-        <text x="85" y="255" fill="#94a3b8" font-size="16">Plus la charge augmente, plus la poutre se courbe et la carte d'effort devient chaude au centre.</text>
-      `;
-    }
-
-    const cfdSpeed = bindValue('cfdSpeed', v => `${Number(v).toFixed(1)} m/s`);
-    const cfdViscosity = bindValue('cfdViscosity', v => `${v}`);
-    const cfdObstacle = bindValue('cfdObstacle', v => `${v} mm`);
-    const cfdTurbulence = bindValue('cfdTurbulence', v => `${v}`);
-
-    function drawCFD() {
-      const canvas = document.getElementById('cfdCanvas');
-      const ctx = canvas.getContext('2d');
-
-      const flow = +cfdSpeed.value;
-      const neck = +cfdViscosity.value;
-      const channelH = +cfdObstacle.value;
-      const mix = +cfdTurbulence.value;
-
-      const w = canvas.width;
-      const h = canvas.height;
-
-      ctx.clearRect(0, 0, w, h);
-
-      const topBase = 60;
-      const cx = w * 0.5;
-      const throatHalf = 50 - neck * 3;
-      const entryHalf = channelH + 35;
-
-      const topWall = (x) => {
-        const d = Math.abs(x - cx) / 170;
-        const smooth = Math.exp(-d * d);
-        return topBase + (entryHalf - throatHalf) * smooth;
-      };
-
-      const bottomWall = (x) => h - topWall(x);
-      const gapAt = (x) => bottomWall(x) - topWall(x);
-
-      ctx.fillStyle = 'rgba(5,10,25,1)';
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      for (let x = 0; x <= w; x += 8) ctx.lineTo(x, topWall(x));
-      ctx.lineTo(w, 0);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(0, h);
-      for (let x = 0; x <= w; x += 8) ctx.lineTo(x, bottomWall(x));
-      ctx.lineTo(w, h);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-      ctx.lineWidth = 3;
-
-      ctx.beginPath();
-      for (let x = 0; x <= w; x += 4) {
-        const y = topWall(x);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      ctx.beginPath();
-      for (let x = 0; x <= w; x += 4) {
-        const y = bottomWall(x);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      for (let j = 0; j < 16; j++) {
-        const yn = j / 15;
-        ctx.beginPath();
-
-        for (let x = 0; x <= w; x += 8) {
-          const top = topWall(x);
-          const gap = gapAt(x);
-          const centerBias = 1 - Math.pow(2 * yn - 1, 2);
-          const accel = (2 * entryHalf) / Math.max(gap, 20);
-          const wiggle = Math.sin((x / 55) + j * 0.7) * mix * 0.3;
-          const y = top + yn * gap + wiggle;
-
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-
-        const t = j / 15;
-        ctx.strokeStyle = `rgba(${Math.round(50 + 180*t)}, ${Math.round(150 - 80*t)}, 255, 0.9)`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-
-      for (let i = 0; i < 120; i++) {
-        const x = (i * 20 + Date.now() * 0.05 * flow) % (w + 20) - 10;
-        const lane = i % 14;
-        const yn = lane / 13;
-        const top = topWall(x);
-        const gap = gapAt(x);
-        const centerBias = 1 - Math.pow(2 * yn - 1, 2);
-        const accel = (2 * entryHalf) / Math.max(gap, 20);
-        const localSpeed = flow * (0.5 + 0.9 * centerBias) * accel;
-        const y = top + yn * gap;
-
-        const t = Math.max(0, Math.min(1, localSpeed / 12));
-        ctx.fillStyle = colorMap(t);
-        ctx.beginPath();
-        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      const vmax = (flow * (2 * entryHalf) / Math.max(2 * throatHalf, 20));
-      document.getElementById('cfdRe').textContent = `${vmax.toFixed(1)}`;
-      document.getElementById('cfdWake').textContent = 'Centre du rétrécissement';
-
-      const lg = ctx.createLinearGradient(470, 22, 650, 22);
-      lg.addColorStop(0, '#1d4ed8');
-      lg.addColorStop(0.5, '#22d3ee');
-      lg.addColorStop(0.75, '#facc15');
-      lg.addColorStop(1, '#ef4444');
-
-      ctx.fillStyle = lg;
-      ctx.fillRect(470, 28, 180, 12);
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      ctx.strokeRect(470, 28, 180, 12);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.font = '14px Arial';
-      ctx.fillText('lent', 470, 20);
-      ctx.fillText('rapide', 610, 20);
-    }
-
-    const gear1Teeth = bindValue('gear1Teeth', v => `${v}`);
-    const gear2Teeth = bindValue('gear2Teeth', v => `${v}`);
-    const gearSpeed = bindValue('gearSpeed', v => `${v} rpm`);
-    const gearTorque = bindValue('gearTorque', v => `${v} N·m`);
-
-    function gearPath(cx, cy, r, teeth, phase) {
-      let d = '';
-      const total = teeth * 2;
-
-      for (let i = 0; i <= total; i++) {
-        const a = phase + (i / total) * Math.PI * 2;
-        const rr = i % 2 === 0 ? r * 1.12 : r * 0.9;
-        const x = cx + rr * Math.cos(a);
-        const y = cy + rr * Math.sin(a);
-        d += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
-      }
-
-      return d + ' Z';
-    }
-
-    function drawGears() {
-      const svg = document.getElementById('gearSvg');
-      const z1 = +gear1Teeth.value;
-      const z2 = +gear2Teeth.value;
-      const n1 = +gearSpeed.value;
-      const torque = +gearTorque.value;
-
-      const ratio = z1 / z2;
-      const out = n1 * ratio;
-
-      document.getElementById('gearRatio').textContent = `${ratio.toFixed(2)}`;
-      document.getElementById('gearOutput').textContent = `${out.toFixed(1)} rpm`;
-
-      const r1 = 45 + z1 * 1.4;
-      const r2 = 45 + z2 * 1.0;
-      const c1x = 220;
-      const c2x = 220 + r1 + r2 - 10;
-      const cy = 160;
-      const phase = Date.now() / 800;
-      const thickness = clamp(torque / 20, 2, 8);
-
-      svg.innerHTML = `
-        <path d="${gearPath(c1x, cy, r1, z1, phase)}" fill="rgba(56,189,248,0.16)" stroke="#38bdf8" stroke-width="${thickness}" />
-        <path d="${gearPath(c2x, cy, r2, z2, -phase * ratio)}" fill="rgba(139,92,246,0.16)" stroke="#8b5cf6" stroke-width="${thickness}" />
-        <circle cx="${c1x}" cy="${cy}" r="16" fill="#e2e8f0" />
-        <circle cx="${c2x}" cy="${cy}" r="16" fill="#e2e8f0" />
-        <line x1="${c1x}" y1="${cy}" x2="${c1x + r1 * 0.7 * Math.cos(phase)}" y2="${cy + r1 * 0.7 * Math.sin(phase)}" stroke="#f8fafc" stroke-width="4" />
-        <line x1="${c2x}" y1="${cy}" x2="${c2x + r2 * 0.7 * Math.cos(-phase * ratio)}" y2="${cy + r2 * 0.7 * Math.sin(-phase * ratio)}" stroke="#f8fafc" stroke-width="4" />
-        <text x="70" y="40" fill="#e2e8f0" font-size="18">Transmission par engrenages</text>
-        <text x="70" y="285" fill="#94a3b8" font-size="16">Le pignon de sortie tourne plus lentement si son nombre de dents augmente.</text>
-      `;
-
-      requestAnimationFrame(drawGears);
-    }
-
-    const rollSpeed = bindValue('rollSpeed', v => `${Number(v).toFixed(1)} m/s`);
-    const rollOmega = bindValue('rollOmega', v => `${Number(v).toFixed(1)} rad/s`);
-    const rollRadius = bindValue('rollRadius', v => `${Number(v).toFixed(2)} m`);
-    const rollFriction = bindValue('rollFriction', v => `${Number(v).toFixed(2)}`);
-
-    function drawRolling() {
-      const svg = document.getElementById('rollSvg');
-      const v = +rollSpeed.value;
-      const omega = +rollOmega.value;
-      const r = +rollRadius.value;
-      const mu = +rollFriction.value;
-
-      const ideal = omega * r;
-      const rawSlip = Math.abs(v - ideal) / Math.max(v, ideal, 0.001);
-      const contactGrip = clamp(0.35 + mu * 0.85, 0.35, 1.2);
-      const effectiveSlip = rawSlip * (1.2 - 0.55 * mu);
-      const slipPct = effectiveSlip * 100;
-      const mode = v <= ideal
-        ? (effectiveSlip < 0.08 ? 'Accélération' : 'Accélération + glissement')
-        : (effectiveSlip < 0.08 ? 'Freinage' : 'Freinage + glissement');
-
-      document.getElementById('rollSlip').textContent = `${slipPct.toFixed(1)} %`;
-      document.getElementById('rollMode').textContent = mode;
-
-      const radiusPx = 60 + r * 40;
-      const cx = 250;
-      const cy = 150;
-      const groundY = cy + radiusPx + 15;
-      const angle = Date.now() / 500 * omega * 0.2;
-      const sink = 6 + effectiveSlip * 20 * (1.08 - mu * 0.35);
-      const traceScale = effectiveSlip * (1.2 - mu * 0.3);
-      const patchWidth = radiusPx * (0.42 + mu * 0.28);
-      const skidDir = v >= ideal ? 1 : -1;
-
-      let traces = '';
-      for (let i = 0; i < 24; i++) {
-        const tx = cx - i * (16 + traceScale * 8) * skidDir;
-        const fade = 1 - i / 24;
-        const depth = 2 + traceScale * 16 * fade;
-        traces += `<ellipse cx="${tx}" cy="${groundY + 2}" rx="${8 + depth}" ry="${2.4 + depth * 0.36}" fill="rgba(90,50,30,${(0.14 + traceScale * 0.55) * fade})" />`;
-      }
-
-      let particles = '';
-      if (effectiveSlip > 0.12) {
-        for (let i = 0; i < 10; i++) {
-          const px = cx - skidDir * (8 + Math.random() * 42);
-          const py = groundY - Math.random() * (8 + effectiveSlip * 24);
-          const pr = 1.2 + Math.random() * 1.8;
-          particles += `<circle cx="${px}" cy="${py}" r="${pr}" fill="rgba(148,101,60,${0.25 + effectiveSlip * 0.45})" />`;
-        }
-      }
-
-      svg.innerHTML = `
-        <defs>
-          <linearGradient id="groundGlow" x1="0" x2="1">
-            <stop offset="0%" stop-color="rgba(124,90,58,0.95)"/>
-            <stop offset="100%" stop-color="rgba(89,63,41,0.98)"/>
-          </linearGradient>
-        </defs>
-        <rect x="0" y="${groundY}" width="700" height="80" fill="url(#groundGlow)" />
-        <line x1="0" y1="${groundY}" x2="700" y2="${groundY}" stroke="rgba(255,255,255,0.16)" stroke-width="2" />
-        <ellipse cx="${cx}" cy="${groundY+1}" rx="${patchWidth}" ry="${sink}" fill="rgba(15,23,42,0.36)" />
-        ${traces}
-        ${particles}
-        <circle cx="${cx}" cy="${cy}" r="${radiusPx}" fill="rgba(56,189,248,0.16)" stroke="#38bdf8" stroke-width="5" />
-        <circle cx="${cx}" cy="${cy}" r="${radiusPx*0.72}" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.12)" stroke-width="2" />
-        <circle cx="${cx}" cy="${cy}" r="10" fill="#fff" />
-        <line x1="${cx}" y1="${cy}" x2="${cx + radiusPx*Math.cos(angle)}" y2="${cy + radiusPx*Math.sin(angle)}" stroke="#fff" stroke-width="4" />
-        <line x1="${cx-120}" y1="${cy-64}" x2="${cx-20}" y2="${cy-64}" stroke="#22c55e" stroke-width="5" />
-        <polygon points="${cx-20},${cy-64} ${cx-34},${cy-72} ${cx-34},${cy-56}" fill="#e2e8f0" />
-        <text x="${cx-138}" y="${cy-74}" fill="#e2e8f0" font-size="14">translation v</text>
-        <rect x="470" y="46" width="165" height="84" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.08)" />
-        <text x="486" y="72" fill="#e2e8f0" font-size="15">μ = ${mu.toFixed(2)}</text>
-        <text x="486" y="95" fill="#94a3b8" font-size="14">glissement : ${slipPct.toFixed(1)} %</text>
-        <text x="486" y="118" fill="#fde68a" font-size="14">${mode}</text>
-        <text x="40" y="40" fill="#e2e8f0" font-size="18">Roue : roulement et glissement</text>
-        <text x="40" y="290" fill="#e2e8f0" font-size="14">Le frottement agit maintenant sur l’adhérence, l’empreinte au sol et l’intensité des traces.</text>
-      `;
-
-      requestAnimationFrame(drawRolling);
-    }
-
-
-    const wingSpeed = bindValue('wingSpeed', v => `${Number(v).toFixed(0)} m/s`);
-    const wingAoA = bindValue('wingAoA', v => `${Number(v).toFixed(1).replace('.0','')}°`);
-    const wingCamber = bindValue('wingCamber', v => `${Number(v).toFixed(1).replace('.0','')} %`);
-    const wingArea = bindValue('wingArea', v => `${v} m²`);
-
-
-    
-
-function drawWing() {
-      const svg = document.getElementById('wingSvg');
-      const speed = +wingSpeed.value;
-      const aoa = +wingAoA.value;
-      const camber = +wingCamber.value;
-      const area = +wingArea.value;
-
-      const rho = 1.225;
-      const stallAngle = 14 + camber * 0.12;
-      const deepLowAngle = aoa <= -1.5;
-      const nearZeroNegative = aoa > -1.5 && aoa < 2;
-      const isStall = aoa > stallAngle;
-
-      let clBase = 0.11 * aoa + 0.045 * camber;
-      if (isStall) {
-        clBase *= clamp(1 - (aoa - stallAngle) * 0.10, 0.48, 1);
-      }
-      const cl = clamp(clBase, -0.9, 1.9);
-      const lift = 0.5 * rho * speed * speed * area * cl / 1000;
-
-      let state = 'Écoulement attaché';
-      if (deepLowAngle) state = 'Portance inversée';
-      else if (nearZeroNegative) state = 'Portance très faible';
-      else if (isStall) state = 'Décrochage';
-      else if (aoa > stallAngle - 2) state = 'Pré-décrochage';
-
-      document.getElementById('wingLift').textContent = `${lift.toFixed(1)} kN`;
-      document.getElementById('wingCl').textContent = `${cl.toFixed(2)}`;
-      document.getElementById('wingState').textContent = state;
-
-      const cx = 342;
-      const cy = 172;
-      const chord = 278;
-      const angle = aoa * Math.PI / 180;
-      const phase = Date.now() * (0.0010 + speed * 0.000045);
-      const speedLevel = clamp(speed / 120, 0, 1);
-      const energy = clamp(Math.abs(cl) * 0.55 + speedLevel * 0.6, 0.12, 1);
-      const tunnelPulse = 0.5 + 0.5 * Math.sin(phase * 0.9);
-      const liftMag = clamp(18 + Math.abs(lift) * 0.28, 24, 56);
-
-      const topPressureStrong = deepLowAngle
-        ? 0.90
-        : isStall
-          ? 0.76
-          : clamp(0.24 + 0.56 * speedLevel + 0.018 * Math.max(0, aoa), 0.24, 0.94);
-      const bottomPressureStrong = deepLowAngle
-        ? 0.22
-        : isStall
-          ? 0.58
-          : clamp(0.26 + 0.30 * speedLevel + 0.15 * Math.max(0, aoa / 10), 0.24, 0.82);
-
-      const topColor = deepLowAngle
-        ? '#ff4d6d'
-        : isStall
-          ? '#ff7a00'
-          : '#00e5ff';
-      const bottomColor = deepLowAngle
-        ? '#3b82f6'
-        : isStall
-          ? '#ffd166'
-          : '#ffb703';
-      const liftColor = cl >= 0 ? '#22c55e' : '#ef4444';
-      const auraColor = deepLowAngle
-        ? 'rgba(244,114,182,0.18)'
-        : isStall
-          ? 'rgba(251,146,60,0.18)'
-          : 'rgba(34,211,238,0.16)';
-
-      const rotate = (x, y) => ({
-        x: cx + x * Math.cos(angle) - y * Math.sin(angle),
-        y: cy + x * Math.sin(angle) + y * Math.cos(angle)
-      });
-
-      let profile = '';
-      const upperPts = [];
-      const lowerPts = [];
-      for (let i = 0; i <= 54; i++) {
-        const t = i / 54;
-        const x = -chord * 0.5 + t * chord;
-        const camberLine = -camber * 1.9 * Math.sin(Math.PI * t);
-        const yt = -(5 + 17 * Math.sin(Math.PI * t) * (0.84 - 0.27 * t));
-        const p = rotate(x, camberLine + yt);
-        upperPts.push(p);
-        profile += (i === 0 ? 'M ' : ' L ') + p.x.toFixed(2) + ' ' + p.y.toFixed(2);
-      }
-      for (let i = 54; i >= 0; i--) {
-        const t = i / 54;
-        const x = -chord * 0.5 + t * chord;
-        const camberLine = -camber * 1.9 * Math.sin(Math.PI * t);
-        const yb = 2 + 7 * Math.sin(Math.PI * t) * (0.66 + 0.20 * t);
-        const p = rotate(x, camberLine + yb);
-        lowerPts.push(p);
-        profile += ' L ' + p.x.toFixed(2) + ' ' + p.y.toFixed(2);
-      }
-      profile += ' Z';
-
-      const pathLine = (d, width, color, opacity, dash='') =>
-        `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" opacity="${opacity}" ${dash ? `stroke-dasharray="${dash}"` : ''}/>`;
-
-      let tunnelGrid = '';
-      for (let i = 0; i <= 10; i++) {
-        const x = 44 + i * 58;
-        tunnelGrid += `<line x1="${x}" y1="34" x2="${x}" y2="286" stroke="rgba(255,255,255,0.045)" stroke-width="1" />`;
-      }
-      for (let j = 0; j <= 6; j++) {
-        const y = 52 + j * 34;
-        tunnelGrid += `<line x1="34" y1="${y}" x2="666" y2="${y}" stroke="rgba(255,255,255,0.04)" stroke-width="1" />`;
-      }
-
-      let glowTrails = '';
-      let streamlines = '';
-      let particles = '';
-      let velocityField = '';
-      const flowCount = 17;
-
-      for (let j = 0; j < flowCount; j++) {
-        const yn = j / (flowCount - 1);
-        const upperBand = yn < 0.5;
-        const xStart = 38;
-        const yBase = 58 + yn * 196;
-        let d = '';
-        let px = null;
-        let py = null;
-
-        for (let x = xStart; x <= 670; x += 7) {
-          const dx = x - cx;
-          const influence = Math.exp(-Math.pow(dx / 128, 2));
-          const band = 1 - Math.abs(yn - 0.5) * 1.55;
-          const streamlineAccel = upperBand
-            ? topPressureStrong * (deepLowAngle ? 0.35 : 1)
-            : bottomPressureStrong * (deepLowAngle ? 1 : 0.58);
-
-          let squeeze;
-          if (deepLowAngle) {
-            squeeze = upperBand
-              ? (8 + 12 * topPressureStrong) * influence * Math.max(0.24, band)
-              : -(16 + 22 * speedLevel) * influence * Math.max(0.22, band);
-          } else if (isStall) {
-            squeeze = upperBand
-              ? -(4 + 8 * speedLevel) * influence * Math.max(0.20, band)
-              : (8 + 11 * bottomPressureStrong) * influence * Math.max(0.18, band);
-          } else {
-            squeeze = upperBand
-              ? -(14 + 26 * topPressureStrong) * influence * Math.max(0.22, band)
-              : (5 + 11 * bottomPressureStrong) * influence * Math.max(0.18, band);
-          }
-
-          const aoaBend = -aoa * 1.2 * influence * Math.max(0.2, band);
-          const wave = Math.sin(x * 0.022 - phase * 1.15 + j * 0.58) * (upperBand ? 0.95 : 0.70);
-          const wake = isStall && upperBand && x > cx + 10
-            ? Math.sin((x - cx) * 0.11 - phase * 2.2 + j * 0.85) * clamp(9 + (aoa - stallAngle) * 3.6, 9, 24) * Math.exp(-(x - cx - 10) / 130)
-            : 0;
-
-          const y = yBase + squeeze + aoaBend + wave + wake;
-          d += x === xStart ? `M ${x.toFixed(2)} ${y.toFixed(2)}` : ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
-
-          const pulse = ((phase * 88 + j * 38) % 640) + 22;
-          if (Math.abs(x - pulse) < 4) {
-            px = x;
-            py = y;
-          }
-
-          if (x > cx - 110 && x < cx + 120 && j % 2 === 0 && x % 21 === 0) {
-            const velLen = clamp(5 + streamlineAccel * 12 + speedLevel * 10, 6, 18);
-            velocityField += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x + velLen).toFixed(1)}" y2="${y.toFixed(1)}" stroke="${upperBand ? topColor : bottomColor}" stroke-width="1.7" opacity="0.34"/>`;
-          }
-        }
-
-        const lineColor = upperBand ? topColor : bottomColor;
-        glowTrails += pathLine(d, upperBand ? 8 : 6.5, auraColor, upperBand ? 0.90 : 0.72);
-        streamlines += pathLine(d, upperBand ? 2.4 : 2.1, lineColor, upperBand ? 0.94 : 0.82);
-
-        if (px !== null) {
-          particles += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${upperBand ? 3.0 : 2.6}" fill="${lineColor}" opacity="0.96"/>`;
-        }
-      }
-
-      let pressureTop = '';
-      for (let i = 5; i < upperPts.length - 5; i += 5) {
-        const p = upperPts[i];
-        const len = 5 + 12 * topPressureStrong + 4 * speedLevel;
-        const dir = deepLowAngle ? 1 : -1;
-        pressureTop += `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${(p.y + dir * len).toFixed(1)}" stroke="${topColor}" stroke-width="2.6" stroke-linecap="round" opacity="0.82"/>`;
-      }
-
-      let pressureBot = '';
-      for (let i = 5; i < lowerPts.length - 5; i += 5) {
-        const p = lowerPts[i];
-        const len = 5 + 10 * bottomPressureStrong + 3 * speedLevel;
-        const dir = deepLowAngle ? -1 : 1;
-        pressureBot += `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${(p.y + dir * len).toFixed(1)}" stroke="${bottomColor}" stroke-width="2.5" stroke-linecap="round" opacity="0.78"/>`;
-      }
-
-      let wakeCloud = '';
-      if (isStall) {
-        for (let i = 0; i < 11; i++) {
-          const wx = cx + 96 + i * 18;
-          const wy = cy - 30 + Math.sin(phase * 2 + i * 0.8) * (7 + i * 0.75) + i * 1.8;
-          wakeCloud += `<circle cx="${wx.toFixed(1)}" cy="${wy.toFixed(1)}" r="${(8 + i * 1.3).toFixed(1)}" fill="rgba(251,146,60,${(0.05 + i * 0.022).toFixed(2)})"/>`;
-        }
-      }
-
-      const liftBase = rotate(18, -10);
-      const liftY2 = cl >= 0 ? liftBase.y - liftMag : liftBase.y + liftMag;
-      const angleRayX = 132 + 44 * Math.cos(-angle);
-      const angleRayY = 228 + 44 * Math.sin(-angle);
-      const arcEndX = 132 + 28 * Math.cos(-angle);
-      const arcEndY = 228 + 28 * Math.sin(-angle);
-
-      const stateText = deepLowAngle
-        ? 'Incidence négative : la dépression bascule et la résultante pointe vers le bas'
-        : isStall
-          ? 'Décrochage : séparation du flux et sillage tourbillonnaire derrière le profil'
-          : aoa > stallAngle - 2
-            ? 'Pré-décrochage : fort gradient de pression, écoulement encore presque attaché'
-            : 'Écoulement attaché : accélération au-dessus du profil et portance stable';
-
-      svg.innerHTML = `
-        <defs>
-          <linearGradient id="wingBodyWow3" x1="0" x2="1">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
-            <stop offset="48%" stop-color="rgba(186,230,253,0.20)"/>
-            <stop offset="100%" stop-color="rgba(255,255,255,0.08)"/>
-          </linearGradient>
-          <linearGradient id="wingStrokeWow3" x1="0" x2="1">
-            <stop offset="0%" stop-color="#f8fafc"/>
-            <stop offset="52%" stop-color="#7dd3fc"/>
-            <stop offset="100%" stop-color="#c4b5fd"/>
-          </linearGradient>
-          <radialGradient id="wingAura3" cx="50%" cy="48%" r="72%">
-            <stop offset="0%" stop-color="${auraColor}"/>
-            <stop offset="55%" stop-color="rgba(139,92,246,0.08)"/>
-            <stop offset="100%" stop-color="rgba(15,23,42,0)"/>
-          </radialGradient>
-          <linearGradient id="wingTunnelGlow" x1="0" x2="1">
-            <stop offset="0%" stop-color="rgba(56,189,248,0.00)"/>
-            <stop offset="50%" stop-color="rgba(56,189,248,${(0.08 + energy * 0.10).toFixed(2)})"/>
-            <stop offset="100%" stop-color="rgba(139,92,246,0.00)"/>
-          </linearGradient>
-          <marker id="wingLiftArrowSmall" markerWidth="9" markerHeight="9" refX="7.2" refY="4.5" orient="auto">
-            <path d="M0,0 L9,4.5 L0,9 z" fill="${liftColor}"></path>
-          </marker>
-          <marker id="flowArrowWing2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
-            <path d="M0,0 L9,4.5 L0,9 z" fill="#e2e8f0"></path>
-          </marker>
-          <filter id="wingSoftGlow3">
-            <feGaussianBlur stdDeviation="9" result="blur"/>
-          </filter>
-        </defs>
-
-        <rect x="22" y="24" width="656" height="272" rx="22" fill="rgba(255,255,255,0.028)" stroke="rgba(255,255,255,0.06)"/>
-        <rect x="22" y="24" width="656" height="272" rx="22" fill="url(#wingAura3)"/>
-        <rect x="38" y="40" width="624" height="240" rx="18" fill="rgba(2,6,23,0.20)" stroke="rgba(255,255,255,0.045)"/>
-        ${tunnelGrid}
-        <ellipse cx="${cx}" cy="${cy+2}" rx="${(158 + speedLevel * 18).toFixed(1)}" ry="${(62 + tunnelPulse * 7).toFixed(1)}" fill="url(#wingTunnelGlow)" opacity="0.95"/>
-
-        ${glowTrails}
-        ${streamlines}
-        ${velocityField}
-        ${particles}
-        ${pressureTop}
-        ${pressureBot}
-        ${wakeCloud}
-
-        <path d="${profile}" fill="#7dd3fc" opacity="0.15" filter="url(#wingSoftGlow3)"/>
-        <path d="${profile}" fill="url(#wingBodyWow3)" stroke="url(#wingStrokeWow3)" stroke-width="3.1"/>
-
-        <line x1="${liftBase.x.toFixed(1)}" y1="${liftBase.y.toFixed(1)}" x2="${liftBase.x.toFixed(1)}" y2="${liftY2.toFixed(1)}"
-          stroke="${liftColor}" stroke-width="3.8" marker-end="url(#wingLiftArrowSmall)" opacity="0.96"/>
-        <text x="${(liftBase.x + 9).toFixed(1)}" y="${(cl >= 0 ? liftY2 - 6 : liftY2 + 16).toFixed(1)}" fill="${liftColor}" font-size="13">portance</text>
-
-        <line x1="50" y1="68" x2="130" y2="68" stroke="#e2e8f0" stroke-width="3.2" marker-end="url(#flowArrowWing2)"/>
-        <text x="50" y="50" fill="#e2e8f0" font-size="13">flux incident</text>
-
-        <line x1="132" y1="228" x2="${angleRayX.toFixed(1)}" y2="${angleRayY.toFixed(1)}" stroke="#facc15" stroke-width="2.8"/>
-        <path d="M 160 228 A 28 28 0 0 0 ${arcEndX.toFixed(1)} ${arcEndY.toFixed(1)}" fill="none" stroke="#facc15" stroke-width="2.1"/>
-        <text x="94" y="253" fill="#fde68a" font-size="12.5">α = ${aoa.toFixed(1).replace('.0','')}°</text>
-
-        <rect x="458" y="36" width="192" height="112" rx="16" fill="rgba(15,23,42,0.74)" stroke="rgba(255,255,255,0.08)"/>
-        <text x="476" y="59" fill="#e2e8f0" font-size="13.5">Lecture aérodynamique</text>
-        <line x1="476" y1="80" x2="510" y2="80" stroke="${topColor}" stroke-width="4"/>
-        <text x="520" y="84" fill="#dbeafe" font-size="12.5">${deepLowAngle ? 'surpression dessus' : isStall ? 'succion dégradée' : 'dépression au-dessus'}</text>
-        <line x1="476" y1="106" x2="510" y2="106" stroke="${bottomColor}" stroke-width="4"/>
-        <text x="520" y="110" fill="#dbeafe" font-size="12.5">${deepLowAngle ? 'dépression dessous' : 'pression sous le profil'}</text>
-
-        <text x="42" y="284" fill="${deepLowAngle ? '#fda4af' : isStall ? '#fdba74' : '#a5f3fc'}" font-size="13.5">${stateText}</text>
-      `;
-    }
-
-
-    let wingAnimationStarted = false;
-
-    function startWingAnimation() {
-      if (wingAnimationStarted) return;
-      wingAnimationStarted = true;
-
-      const loop = () => {
-        drawWing();
-        requestAnimationFrame(loop);
-      };
-
-      loop();
-    }
-
-    function fullUpdate() {
-      drawTraction();
-      drawBeam();
-      drawCFD();
-    }
-
-    [
-      'tractionForce','tractionPoisson','tractionThickness','tractionStiffness',
-      'beamLoad','beamSpan','beamHeight','beamYoung',
-      'cfdSpeed','cfdViscosity','cfdObstacle','cfdTurbulence',
-      'gear1Teeth','gear2Teeth','gearSpeed','gearTorque',
-      'rollSpeed','rollOmega','rollRadius','rollFriction',
-      'wingSpeed','wingAoA','wingCamber','wingArea'
-    ].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('input', fullUpdate);
-    });
-
-    fullUpdate();
-    drawGears();
-    drawRolling();
-    startWingAnimation();
-  </script>
-</body>
-</html>
+    const localSpeed = flow * (0.55 + 0.45 * (1 - Math.abs(yn - 0.5) * 2));
+    const t = Math.max(0, Math.min(1, localSpeed / 10));
+    ctx.strokeStyle = colorMap(t).replace('rgb', 'rgba').replace(')', ',0.78)');
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+  }
+
+  // particules plus propres
+  for (let i = 0; i < 140; i++) {
+    const x = (i * 18 + Date.now() * 0.06 * flow) % (w + 30) - 15;
+    const lane = i % 16;
+    const yn = lane / 15;
+    const top = topWall(x);
+    const gap = gapAt(x);
+    const centerBias = 1 - Math.pow(2 * yn - 1, 2);
+    const accel = (2 * entryHalf) / Math.max(gap, 20);
+    const localSpeed = flow * (0.5 + 0.95 * centerBias) * accel;
+    const y = top + yn * gap;
+
+    const t = Math.max(0, Math.min(1, localSpeed / 12));
+    const radius = 1.8 + centerBias * 1.2;
+
+    ctx.beginPath();
+    ctx.fillStyle = colorMap(t);
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // zone de rétrécissement légèrement mise en valeur
+  const zoneGlow = ctx.createLinearGradient(cx - 90, 0, cx + 90, 0);
+  zoneGlow.addColorStop(0, 'rgba(56,189,248,0)');
+  zoneGlow.addColorStop(0.5, 'rgba(56,189,248,0.08)');
+  zoneGlow.addColorStop(1, 'rgba(56,189,248,0)');
+  ctx.fillStyle = zoneGlow;
+  ctx.fillRect(cx - 90, 35, 180, h - 70);
+
+  const vmax = (flow * (2 * entryHalf) / Math.max(2 * throatHalf, 20));
+  document.getElementById('cfdRe').textContent = `${vmax.toFixed(1)}`;
+  document.getElementById('cfdWake').textContent = 'Centre du rétrécissement';
+
+  // légende
+  const lg = ctx.createLinearGradient(470, 22, 650, 22);
+  lg.addColorStop(0, '#1d4ed8');
+  lg.addColorStop(0.5, '#22d3ee');
+  lg.addColorStop(0.75, '#facc15');
+  lg.addColorStop(1, '#ef4444');
+
+  ctx.fillStyle = lg;
+  ctx.fillRect(470, 28, 180, 10);
+  ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+  ctx.strokeRect(470, 28, 180, 10);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.82)';
+  ctx.font = '13px Arial';
+  ctx.fillText('lent', 470, 20);
+  ctx.fillText('rapide', 610, 20);
+}
+
+function drawGears() {
+  const svg = document.getElementById('gearSvg');
+  const z1 = +gear1Teeth.value;
+  const z2 = +gear2Teeth.value;
+  const n1 = +gearSpeed.value;
+  const torque = +gearTorque.value;
+
+  const ratio = z1 / z2;
+  const out = n1 * ratio;
+
+  document.getElementById('gearRatio').textContent = `${ratio.toFixed(2)}`;
+  document.getElementById('gearOutput').textContent = `${out.toFixed(1)} rpm`;
+
+  const r1 = 45 + z1 * 1.4;
+  const r2 = 45 + z2 * 1.0;
+  const c1x = 220;
+  const c2x = 220 + r1 + r2 - 10;
+  const cy = 160;
+  const phase = Date.now() / 850;
+  const thickness = clamp(torque / 22, 2.5, 6);
+
+  svg.innerHTML = `
+    <defs>
+      <radialGradient id="gearBg" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="rgba(56,189,248,0.08)" />
+        <stop offset="55%" stop-color="rgba(139,92,246,0.05)" />
+        <stop offset="100%" stop-color="rgba(15,23,42,0)" />
+      </radialGradient>
+
+      <radialGradient id="gear1Fill" cx="35%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="#bfe9ff" />
+        <stop offset="45%" stop-color="#5cccf6" />
+        <stop offset="100%" stop-color="#1e7496" />
+      </radialGradient>
+
+      <radialGradient id="gear2Fill" cx="35%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="#ddd6fe" />
+        <stop offset="45%" stop-color="#a78bfa" />
+        <stop offset="100%" stop-color="#6d48d7" />
+      </radialGradient>
+
+      <filter id="softGlow">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+      </filter>
+    </defs>
+
+    <rect x="22" y="24" width="656" height="272" rx="22"
+          fill="rgba(255,255,255,0.025)"
+          stroke="rgba(255,255,255,0.06)" />
+
+    <ellipse cx="350" cy="160" rx="245" ry="110" fill="url(#gearBg)" />
+
+    <line x1="${c1x}" y1="${cy}" x2="${c2x}" y2="${cy}"
+          stroke="rgba(255,255,255,0.08)" stroke-width="6" />
+
+    <circle cx="${c1x}" cy="${cy}" r="${r1 + 10}"
+            fill="rgba(56,189,248,0.07)" filter="url(#softGlow)" />
+    <circle cx="${c2x}" cy="${cy}" r="${r2 + 10}"
+            fill="rgba(139,92,246,0.07)" filter="url(#softGlow)" />
+
+    <path d="${gearPath(c1x, cy, r1, z1, phase)}"
+          fill="url(#gear1Fill)"
+          stroke="rgba(255,255,255,0.38)"
+          stroke-width="${thickness}" />
+
+    <path d="${gearPath(c2x, cy, r2, z2, -phase * ratio)}"
+          fill="url(#gear2Fill)"
+          stroke="rgba(255,255,255,0.34)"
+          stroke-width="${thickness}" />
+
+    <circle cx="${c1x}" cy="${cy}" r="${r1 * 0.64}"
+            fill="rgba(15,23,42,0.55)"
+            stroke="rgba(255,255,255,0.14)"
+            stroke-width="2" />
+
+    <circle cx="${c2x}" cy="${cy}" r="${r2 * 0.64}"
+            fill="rgba(15,23,42,0.55)"
+            stroke="rgba(255,255,255,0.14)"
+            stroke-width="2" />
+
+    <circle cx="${c1x}" cy="${cy}" r="13" fill="#f8fafc" />
+    <circle cx="${c2x}" cy="${cy}" r="13" fill="#f8fafc" />
+
+    <line x1="${c1x}" y1="${cy}"
+          x2="${c1x + r1 * 0.68 * Math.cos(phase)}"
+          y2="${cy + r1 * 0.68 * Math.sin(phase)}"
+          stroke="#eff6ff" stroke-width="4" stroke-linecap="round" />
+
+    <line x1="${c2x}" y1="${cy}"
+          x2="${c2x + r2 * 0.68 * Math.cos(-phase * ratio)}"
+          y2="${cy + r2 * 0.68 * Math.sin(-phase * ratio)}"
+          stroke="#f5f3ff" stroke-width="4" stroke-linecap="round" />
+
+    <circle cx="${c1x}" cy="${cy}" r="${r1 + 5}"
+            fill="none"
+            stroke="rgba(125,211,252,0.18)"
+            stroke-width="1.8" />
+
+    <circle cx="${c2x}" cy="${cy}" r="${r2 + 5}"
+            fill="none"
+            stroke="rgba(196,181,253,0.18)"
+            stroke-width="1.8" />
+  `;
+
+  requestAnimationFrame(drawGears);
+}
+</script>
