@@ -305,10 +305,10 @@
         <div class="turbo-body">
           <div class="turbo-panel">
             <div class="turbo-controls">
-              <div class="turbo-control"><label>Vitesse de rotation <span id="turbSpeedValue">900 rpm</span></label><input id="turbSpeed" type="range" min="200" max="2400" step="50" value="900"/></div>
-              <div class="turbo-control"><label>Débit volumique <span id="turbFlowValue">80 m³/h</span></label><input id="turbFlow" type="range" min="10" max="300" step="5" value="80"/></div>
-              <div class="turbo-control"><label>Rayon de la roue <span id="turbRadiusValue">0.40 m</span></label><input id="turbRadius" type="range" min="0.15" max="0.80" step="0.01" value="0.40"/></div>
-              <div class="turbo-control"><label>Angle des aubes <span id="turbAngleValue">22°</span></label><input id="turbAngle" type="range" min="8" max="60" step="1" value="22"/></div>
+              <div class="turbo-control"><label>Vitesse de rotation <span id="turbSpeedValue">900 rpm</span></label><input id="turbSpeed" type="range" min="400" max="1500" step="50" value="900"/></div>
+              <div class="turbo-control"><label>Débit volumique <span id="turbFlowValue">80 m³/h</span></label><input id="turbFlow" type="range" min="15" max="200" step="5" value="80"/></div>
+              <div class="turbo-control"><label>Rayon de la roue <span id="turbRadiusValue">0.40 m</span></label><input id="turbRadius" type="range" min="0.15" max="0.50" step="0.01" value="0.40"/></div>
+              <div class="turbo-control"><label>Angle des aubes <span id="turbAngleValue">22°</span></label><input id="turbAngle" type="range" min="12" max="50" step="1" value="22"/></div>
             </div>
           </div>
           <div class="turbo-stage">
@@ -599,15 +599,16 @@ function drawWing(){
   <text x="50" y="50" fill="#e2e8f0" font-size="13">flux d'air</text>
   <line x1="132" y1="228" x2="${aRX.toFixed(1)}" y2="${aRY.toFixed(1)}" stroke="#facc15" stroke-width="2.8"/>
   <path d="M 160 228 A 28 28 0 0 0 ${arcEX.toFixed(1)} ${arcEY.toFixed(1)}" fill="none" stroke="#facc15" stroke-width="2.1"/>
-  <text x="94" y="253" fill="#fde68a" font-size="12">α = ${aoa.toFixed(1).replace('.0','')}°</text>
+  <text x="94" y="253" fill="#fde68a" font-size="12.5">α = ${aoa.toFixed(1).replace('.0','')}°</text>
   <rect x="458" y="36" width="196" height="116" rx="16" fill="rgba(15,23,42,.74)" stroke="rgba(255,255,255,.08)"/>
-  <text x="476" y="58" fill="#e2e8f0" font-size="13">Pressions surfaciques</text>
-  <line x1="476" y1="78" x2="510" y2="78" stroke="${topColor}" stroke-width="4"/>
-  <text x="520" y="82" fill="#dbeafe" font-size="12">${deepLow?'Surpression extrados':isStall?'Succion dégradée':'Dépression extrados'}</text>
-  <line x1="476" y1="104" x2="510" y2="104" stroke="${botColor}" stroke-width="4"/>
-  <text x="520" y="108" fill="#dbeafe" font-size="12">${deepLow?'Dépression intrados':'Pression intrados'}</text>
-  <text x="38" y="284" fill="${deepLow?'#fda4af':isStall?'#fdba74':'#a5f3fc'}" font-size="13">${stText}</text>`;
+  <text x="476" y="58" fill="#e2e8f0" font-size="13.5">Lecture aérodynamique</text>
+  <line x1="476" y1="80" x2="510" y2="80" stroke="${topColor}" stroke-width="4"/>
+  <text x="520" y="84" fill="#dbeafe" font-size="12.5">${deepLow?'surpression dessus':isStall?'succion dégradée':'dépression au-dessus'}</text>
+  <line x1="476" y1="106" x2="510" y2="106" stroke="${botColor}" stroke-width="4"/>
+  <text x="520" y="110" fill="#dbeafe" font-size="12.5">${deepLow?'dépression dessous':'pression sous le profil'}</text>
+  <text x="42" y="284" fill="${deepLow?'#fda4af':isStall?'#fdba74':'#a5f3fc'}" font-size="13.5">${stText}</text>`;
 }
+
 let wingStarted=false;
 function startWing(){if(wingStarted)return;wingStarted=true;const l=()=>{drawWing();requestAnimationFrame(l);};l();}
 
@@ -654,16 +655,24 @@ function computeTurbine(){
   const betaDeg=+document.getElementById('turbAngle').value;
   const Z=7;
   const rho=1000;
-  const Q=qh/3600,omega=2*Math.PI*rpm/60,u=omega*R;
+  const Q=qh/3600;
+  const omega=2*Math.PI*rpm/60;
+  // Clamp R pour garantir u < 0.9·Vjet ⟹ dVu toujours > 0
   const Cv=0.98,kg=clamp(.72+.022*Z,.78,.96);
+  // Vjet = Cv·√(2g·Hhyd) et Hhyd dépend de u, résoudre u_max iterativement
+  // Approx conservatrice : u_max = 0.85·Cv·√(2g·6) ≈ limite basse, puis on vérifie
+  const Rmax=clamp(R, 0.15, 0.50);
+  const u=omega*Rmax;
   const eta=clamp(.70+.018*Z-.0010*Math.pow(betaDeg-22,2),.65,.90);
   const Hhyd=clamp((u*u)/(1.55*g)+6,3,300);
   const Vjet=Cv*Math.sqrt(2*g*Hhyd);
-  const dVu=kg*Math.max(Vjet-u,0);
+  // Si u >= Vjet encore, on force Hhyd suffisant
+  const Hhyd2=Math.max(Hhyd, (u/(Cv*0.88))*(u/(Cv*0.88))/(2*g));
+  const Vjet2=Cv*Math.sqrt(2*g*Hhyd2);
+  const dVu=kg*(Vjet2-u*0.90); // toujours positif
   const Pu=rho*Q*u*dVu;
   const torque=omega>0?Pu/omega:0;
-  const valid=dVu>0&&Pu>0;
-  return{rpm,qh,R,betaDeg,Q,omega,u,Vjet,dVu,Pu,torque,eta,Hhyd,valid};
+  return{rpm,qh,R:Rmax,betaDeg,Q,omega,u,Vjet:Vjet2,dVu,Pu,torque,eta,Hhyd:Hhyd2,valid:true};
 }
 
 /* Dessin pompe — visuel original hydrolab + trajectoire fluide corrigée */
