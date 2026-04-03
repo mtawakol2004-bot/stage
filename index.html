@@ -3,321 +3,637 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Portfolio MAM — Simulations interactives · Tawakol</title>
+  <title>Tawakol — Ingénierie Numérique · MAM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg-1:#030712;--bg-2:#0f172a;--bg-3:#111827;
-      --panel:rgba(15,23,42,0.72);--card:rgba(17,24,39,0.76);
-      --text:#e5eefc;--muted:#94a3b8;--accent:#38bdf8;--accent-2:#8b5cf6;
-      --border:rgba(255,255,255,0.08);--shadow:0 18px 50px rgba(0,0,0,0.35);--radius:22px;
+    /* ═══════════════════════════════════════
+       DESIGN SYSTEM — LUXURY ENGINEERING LAB
+       Palette: Near-black + warm gold + electric teal
+       Typography: DM Serif Display / DM Sans / Space Mono
+       Aesthetic: Swiss precision meets atelier darkness
+    ═══════════════════════════════════════ */
+    :root {
+      --ink:      #0c0d0f;
+      --paper:    #111316;
+      --surface:  #181b1f;
+      --raised:   #1e2228;
+      --border:   rgba(255,255,255,0.07);
+      --border-h: rgba(255,255,255,0.14);
+      --text:     #eceef2;
+      --muted:    #7a808c;
+      --faint:    #3a3f48;
+      --gold:     #e74c3c;
+      --gold-l:   #f1948a;
+      --teal:     #e8e8e8;
+      --teal-d:   #bdc3c7;
+      --red:      #f87171;
+      --amber:    #fbbf24;
+      --r:        16px;
+      --r-sm:     10px;
+      --r-lg:     24px;
     }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    html{scroll-behavior:smooth;}
-    body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--text);
-      background:radial-gradient(circle at top left,rgba(56,189,248,0.16),transparent 28%),
-        radial-gradient(circle at top right,rgba(167,139,250,0.14),transparent 25%),
-        linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 48%,var(--bg-3) 100%);
-      min-height:100vh;}
-    body::before{content:"";position:fixed;inset:0;pointer-events:none;
-      background:linear-gradient(rgba(255,255,255,0.02),rgba(255,255,255,0.01)),
-        repeating-linear-gradient(90deg,rgba(255,255,255,0.018) 0px,rgba(255,255,255,0.018) 1px,transparent 1px,transparent 22px);
-      z-index:0;}
-    .page{position:relative;z-index:1;}
-    header{max-width:1280px;margin:0 auto;padding:42px 18px 18px;text-align:center;}
-    .badge{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;
-      background:rgba(15,23,42,0.72);border:1px solid rgba(56,189,248,0.24);color:#bae6fd;
-      box-shadow:0 10px 25px rgba(56,189,248,0.08);font-size:.92rem;font-weight:600;margin-bottom:16px;backdrop-filter:blur(10px);}
-    header h1{margin:0 0 14px;font-size:clamp(2rem,5vw,3.8rem);line-height:1.05;letter-spacing:-.03em;}
-    header p{margin:0 auto;max-width:920px;color:var(--muted);font-size:1rem;line-height:1.65;}
-    .container{max-width:1280px;margin:0 auto;padding:20px 14px 60px;display:grid;gap:22px;}
-    .intro{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;padding:22px;border-radius:var(--radius);
-      background:var(--panel);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(14px);}
-    .intro h2{margin:0;font-size:1.35rem;}
-    .intro p{margin:10px 0 0;color:var(--muted);line-height:1.7;}
-    .legend{display:flex;flex-direction:column;justify-content:center;gap:12px;padding:16px;
-      border-radius:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);}
-    .legend-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-    .legend strong{font-size:1rem;}
-    .legend-bar{width:100%;height:14px;border-radius:999px;
-      background:linear-gradient(90deg,#1d4ed8,#22d3ee,#facc15,#f97316,#dc2626);
-      border:1px solid rgba(255,255,255,0.12);box-shadow:inset 0 1px 4px rgba(255,255,255,0.12);}
-    .legend span{color:var(--muted);font-size:.95rem;}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;}
-    .card{display:grid;grid-template-rows:auto auto 1fr;overflow:hidden;border-radius:var(--radius);
-      background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(14px);
-      transition:transform .2s ease,box-shadow .2s ease;}
-    .card:hover{transform:translateY(-2px);box-shadow:0 22px 55px rgba(0,0,0,.42);}
-    .card-header{padding:22px 20px 10px;}
-    .card-header h2{margin:0 0 8px;font-size:1.22rem;line-height:1.3;}
-    .card-header p{margin:0;color:var(--muted);line-height:1.55;font-size:.96rem;}
-    .controls{padding:16px 20px 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;
-      background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);}
-    .control{display:flex;flex-direction:column;gap:8px;min-width:0;}
-    .control label{display:flex;justify-content:space-between;gap:10px;font-size:.93rem;font-weight:600;color:#dbeafe;line-height:1.4;}
-    .control label span{color:#7dd3fc;font-weight:700;white-space:nowrap;}
-    input[type="range"]{width:100%;cursor:pointer;accent-color:var(--accent);}
-    .stage{padding:18px;display:grid;gap:12px;}
-    .stage svg,.stage canvas{width:100%;height:360px;display:block;border-radius:18px;
-      background:radial-gradient(circle at top,rgba(56,189,248,.10),rgba(15,23,42,.38)),
-        linear-gradient(180deg,rgba(15,23,42,.82),rgba(2,6,23,.96));
-      border:1px solid rgba(255,255,255,.06);}
-    .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
-    .metric{padding:13px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);min-width:0;}
-    .metric span{display:block;color:var(--muted);font-size:.84rem;margin-bottom:4px;line-height:1.35;}
-    .metric strong{display:block;font-size:1rem;line-height:1.35;word-break:break-word;}
-    .wing-card{position:relative;overflow:hidden;}
-    .wing-card::before{content:"";position:absolute;inset:-1px;pointer-events:none;
-      background:radial-gradient(circle at 18% 18%,rgba(56,189,248,.20),transparent 24%),
-        radial-gradient(circle at 82% 24%,rgba(139,92,246,.16),transparent 28%),
-        linear-gradient(135deg,rgba(56,189,248,.10),transparent 35%,rgba(139,92,246,.10) 70%,transparent 100%);opacity:1;}
-    /* TURBO — 2 cartes séparées pleine largeur */
-    .turbo-card{grid-column:1/-1;overflow:hidden;border-radius:var(--radius);
-      background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(14px);
-      transition:transform .2s ease,box-shadow .2s ease;}
-    .turbo-card:hover{transform:translateY(-2px);box-shadow:0 22px 55px rgba(0,0,0,.42);}
-    .turbo-body{display:grid;grid-template-columns:280px 1fr;}
-    .turbo-panel{padding:16px 18px;background:rgba(255,255,255,.03);border-right:1px solid rgba(255,255,255,.05);
-      display:flex;flex-direction:column;gap:10px;}
-    .turbo-controls{display:flex;flex-direction:column;gap:9px;}
-    .turbo-control{display:flex;flex-direction:column;gap:5px;}
-    .turbo-control label{display:flex;justify-content:space-between;gap:8px;font-size:.87rem;font-weight:600;color:#dbeafe;line-height:1.4;}
-    .turbo-control label span{color:#7dd3fc;font-weight:700;white-space:nowrap;}
-    .turbo-stage{padding:14px;display:flex;flex-direction:column;gap:10px;}
-    .turbo-stage svg{width:100%;height:340px;display:block;border-radius:16px;
-      background:radial-gradient(circle at 50% 40%,rgba(55,198,255,.10),rgba(15,23,42,.38)),
-        linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.98));
-      border:1px solid rgba(255,255,255,.06);}
-    .pump-card .turbo-stage svg{background:radial-gradient(circle at 50% 40%,rgba(55,198,255,.12),rgba(15,23,42,.38)),linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.98));}
-    .turbine-card .turbo-stage svg{background:radial-gradient(circle at 50% 40%,rgba(54,212,142,.10),rgba(15,23,42,.38)),linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.98));}
-    .turbo-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
-    .turbo-metric{padding:11px 10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);min-width:0;}
-    .turbo-metric span{display:block;color:var(--muted);font-size:.80rem;margin-bottom:4px;line-height:1.3;}
-    .turbo-metric strong{display:block;font-size:.94rem;line-height:1.3;word-break:break-word;}
-    footer{max-width:1280px;margin:0 auto;padding:0 18px 56px;color:var(--muted);font-size:.94rem;line-height:1.7;text-align:center;}
-    @media(max-width:1024px){
-      .intro{grid-template-columns:1fr;}.grid{grid-template-columns:1fr;}
-      .stage svg,.stage canvas{height:300px;}
-      .turbo-body{grid-template-columns:1fr;}
-      .turbo-panel{border-right:none;border-bottom:1px solid rgba(255,255,255,.05);}
-      .turbo-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--ink);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    @media(max-width:768px){
-      header{padding:28px 14px 12px;}.container{padding:14px 10px 36px;gap:16px;}
-      .card-header{padding:16px 14px 8px;}.controls{grid-template-columns:1fr;padding:14px;}
-      .stage{padding:14px;}.metrics{grid-template-columns:1fr;}
-      .stage svg,.stage canvas{height:260px;}
-      .turbo-stage svg{height:250px;}.turbo-metrics{grid-template-columns:1fr 1fr;}
+
+    /* Subtle noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.5;
     }
-    @media(max-width:480px){
-      .badge{font-size:.8rem;padding:8px 12px;}header h1{font-size:1.75rem;}
-      .control label{flex-direction:column;align-items:flex-start;}
-      .stage svg,.stage canvas{height:230px;border-radius:14px;}
-      .turbo-metrics{grid-template-columns:1fr;}
+
+    .page { position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
+    header {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 72px 32px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-left {}
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 20px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: block; width: 28px; height: 1px; background: var(--gold);
+    }
+    header h1 {
+      margin: 0;
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5vw, 5rem);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    header h1 em {
+      font-style: italic;
+      color: var(--gold-l);
+    }
+    .header-sub {
+      margin: 16px 0 0;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 300;
+      max-width: 520px;
+    }
+    .header-right { text-align: right; padding-bottom: 6px; }
+    .version-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; color: var(--muted);
+      letter-spacing: 0.06em;
+      line-height: 2;
+    }
+    .version-badge strong { color: var(--teal); display: block; font-size: 1.1rem; }
+
+    /* ── LEGEND BAR ── */
+    .legend-strip {
+      max-width: 1320px; margin: 0 auto;
+      padding: 20px 32px;
+      display: flex; align-items: center; gap: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .legend-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); white-space: nowrap;
+    }
+    .legend-bar {
+      flex: 1; height: 6px; border-radius: 999px;
+      background: linear-gradient(90deg,#1d4ed8,#22d3ee,#facc15,#f97316,#dc2626);
+    }
+    .legend-ticks {
+      display: flex; justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem; color: var(--faint);
+      width: 100%; margin-top: 4px;
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 1320px; margin: 0 auto;
+      padding: 40px 32px 80px;
+      display: grid; gap: 28px;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 20px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      border-radius: var(--r-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      border-color: var(--border-h);
+      box-shadow: 0 0 0 1px rgba(231,76,60,0.08), 0 32px 64px rgba(0,0,0,0.5);
+    }
+
+    /* Card accent bar at top */
+    .card::before {
+      content: '';
+      display: block; height: 2px;
+      background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
+      opacity: 0.6;
+    }
+
+    .card-header { padding: 24px 24px 0; }
+    .card-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 10px;
+    }
+    .card-header h2 {
+      margin: 0 0 10px;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.28rem; font-weight: 400;
+      line-height: 1.25; letter-spacing: -0.01em;
+    }
+    .card-header p {
+      margin: 0;
+      font-size: 0.88rem; color: var(--muted);
+      line-height: 1.65; font-weight: 300;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      margin: 20px 24px 0;
+      padding: 16px;
+      border-radius: var(--r);
+      background: var(--raised);
+      border: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 20px;
+    }
+    .control { display: flex; flex-direction: column; gap: 7px; }
+    .control label {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .control label span {
+      color: var(--teal); font-weight: 700; white-space: nowrap;
+      font-size: 0.78rem;
+    }
+    input[type="range"] {
+      width: 100%; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      height: 3px; border-radius: 999px;
+      background: var(--faint);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--ink);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 0 4px rgba(231,76,60,0.18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--gold); border: 2px solid var(--ink); cursor: pointer;
+    }
+
+    /* ── STAGE ── */
+    .stage {
+      margin: 20px 24px 24px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .stage svg, .stage canvas {
+      width: 100%; height: 340px; display: block;
+      border-radius: var(--r);
+      background: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    /* ── METRICS ── */
+    .metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .metric {
+      padding: 12px 14px;
+      border-radius: var(--r-sm);
+      background: var(--raised);
+      border: 1px solid var(--border);
+    }
+    .metric span {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.60rem; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 5px;
+    }
+    .metric strong {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.88rem; color: var(--text);
+      word-break: break-word; line-height: 1.3;
+    }
+
+    /* ── WING CARD (gradient accent) ── */
+    .wing-card { position: relative; }
+
+    /* ── TURBO CARDS ── */
+    .turbo-card {
+      border-radius: var(--r-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .turbo-card:hover {
+      border-color: var(--border-h);
+      box-shadow: 0 0 0 1px rgba(231,76,60,0.08), 0 32px 64px rgba(0,0,0,0.5);
+    }
+    .turbo-card::before {
+      content: '';
+      display: block; height: 2px;
+      background: linear-gradient(90deg, var(--teal) 0%, var(--gold) 50%, transparent 80%);
+      opacity: 0.5;
+    }
+    .turbo-header { padding: 24px 28px 0; }
+    .turbo-header .card-num { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .turbo-header h2 {
+      margin: 0 0 8px;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem; font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .turbo-header p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.65; font-weight: 300; max-width: 700px; }
+    .turbo-body {
+      display: flex;
+      flex-direction: column;
+    }
+    .turbo-panel {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .turbo-controls { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px 18px; }
+    .turbo-control { display: flex; flex-direction: column; gap: 6px; }
+    .turbo-control label {
+      display: flex; justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .turbo-control label span { color: var(--teal); font-weight: 700; font-size: 0.74rem; }
+    .turbo-stage { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 12px; }
+    .turbo-stage svg {
+      width: 100%; height: 320px; display: block;
+      border-radius: var(--r);
+      background: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .turbo-metrics { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+    .turbo-metric {
+      padding: 11px 13px;
+      border-radius: var(--r-sm);
+      background: var(--raised);
+      border: 1px solid var(--border);
+    }
+    .turbo-metric span {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 4px;
+    }
+    .turbo-metric strong {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.84rem; color: var(--text); word-break: break-word; line-height: 1.3;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      max-width: 1320px; margin: 0 auto;
+      padding: 28px 32px 64px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .footer-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem; color: var(--text); font-weight: 400;
+    }
+    .footer-meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.66rem; color: var(--muted); letter-spacing: 0.06em;
+      text-align: right; line-height: 1.8;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 0 4px;
+    }
+    .section-title h3 {
+      margin: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); font-weight: 400;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .grid { grid-template-columns: 1fr; }
+      .turbo-body { grid-template-columns: 1fr; }
+      .turbo-panel { border-right: none; border-bottom: 1px solid var(--border); }
+      .turbo-metrics { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      header { grid-template-columns: 1fr; padding: 48px 20px 32px; }
+      .header-right { text-align: left; }
+      .container { padding: 24px 16px 48px; }
+      .controls { grid-template-columns: 1fr; }
+      .stage svg, .stage canvas { height: 270px; }
+      .turbo-stage svg { height: 250px; }
+      .metrics { grid-template-columns: 1fr; }
+      .legend-strip { padding: 16px 20px; flex-wrap: wrap; }
+    }
+    @media (max-width: 480px) {
+      header h1 { font-size: 2rem; }
+      .card-header { padding: 18px 16px 0; }
+      .controls { margin: 16px 16px 0; }
+      .stage { margin: 16px 16px 16px; }
+      .stage svg, .stage canvas { height: 230px; }
+      .turbo-metrics { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
 <div class="page">
+
+  <!-- ══ HEADER ══ -->
   <header>
-    <div class="badge">Portfolio interactif · Master MAM · Université Claude Bernard Lyon 1</div>
-    <h1>Simulations mécaniques &amp; fluides</h1>
+    <div class="header-left">
+      <div class="eyebrow">Portfolio interactif · Master MAM</div>
+      <h1>Simulations <em>mécaniques</em><br>&amp; fluides</h1>
+      <p class="header-sub">Modules interactifs — structures, dynamique des fluides, turbomachines. Chaque curseur recalcule la physique en temps réel.</p>
+    </div>
+    <div class="header-right">
+      <div class="version-badge">
+        <strong>Tawakol</strong>
+        Université Claude Bernard Lyon 1<br>
+        Modélisation et Applications en Mécanique
+      </div>
+    </div>
   </header>
+
+  <!-- ══ LEGEND ══ -->
+  <div class="legend-strip">
+    <span class="legend-label">Intensité</span>
+    <div style="flex:1">
+      <div class="legend-bar"></div>
+      <div class="legend-ticks"><span>faible</span><span>modéré</span><span>élevé</span><span>critique</span></div>
+    </div>
+  </div>
+
   <main class="container">
 
-    <section class="intro">
-      <div>
-        <h2>Simulations développées en Master MAM</h2>
-        <p>8 modules interactifs — structures, fluides, turbomachines. Déplacez les curseurs pour observer les effets en temps réel.</p>
-      </div>
-      <div class="legend">
-        <div class="legend-top"><strong>Échelle d'intensité</strong></div>
-        <div class="legend-bar"></div>
-        <span>faible → forte intensité (contrainte, vitesse, pression)</span>
-      </div>
-    </section>
+    <div class="section-title"><h3>Mécanique des structures</h3></div>
 
     <section class="grid">
 
       <!-- 1. TRACTION -->
-      <article class="card">
+      <article class="card reveal">
         <div class="card-header">
-          <h2>1. Traction axiale d'une plaque</h2>
+          <div class="card-num">Module 01 · FEA</div>
+          <h2>Traction axiale d'une plaque</h2>
           <p>Plaque encastrée sous traction axiale. La carte de couleur montre la distribution des contraintes. L'effet de Poisson contracte le profil latéralement.</p>
         </div>
         <div class="controls">
           <div class="control"><label>Force appliquée <span id="tractionForceValue">45 kN</span></label><input id="tractionForce" type="range" min="5" max="100" value="45"/></div>
-          <div class="control"><label>Coefficient de Poisson ν <span id="tractionPoissonValue">0.30</span></label><input id="tractionPoisson" type="range" min="0" max="0.45" step="0.01" value="0.30"/></div>
-          <div class="control"><label>Épaisseur de la plaque <span id="tractionThicknessValue">18 mm</span></label><input id="tractionThickness" type="range" min="8" max="30" value="18"/></div>
-          <div class="control"><label>Module de rigidité <span id="tractionStiffnessValue">60</span></label><input id="tractionStiffness" type="range" min="20" max="100" value="60"/></div>
+          <div class="control"><label>Coeff. Poisson ν <span id="tractionPoissonValue">0.30</span></label><input id="tractionPoisson" type="range" min="0" max="0.45" step="0.01" value="0.30"/></div>
+          <div class="control"><label>Épaisseur <span id="tractionThicknessValue">18 mm</span></label><input id="tractionThickness" type="range" min="8" max="30" value="18"/></div>
+          <div class="control"><label>Rigidité <span id="tractionStiffnessValue">60</span></label><input id="tractionStiffness" type="range" min="20" max="100" value="60"/></div>
         </div>
         <div class="stage">
           <svg id="tractionSvg" viewBox="0 0 700 320"></svg>
           <div class="metrics">
-            <div class="metric"><span>Déplacement maximal</span><strong id="tractionDisp">0 mm</strong></div>
-            <div class="metric"><span>Contrainte estimée</span><strong id="tractionStress">0 MPa</strong></div>
-            <div class="metric"><span>Visualisation</span><strong>Carte contraintes + déformée</strong></div>
+            <div class="metric"><span>Dépl. max</span><strong id="tractionDisp">0 mm</strong></div>
+            <div class="metric"><span>Contrainte</span><strong id="tractionStress">0 MPa</strong></div>
+            <div class="metric"><span>Visualisation</span><strong>Contraintes + déformée</strong></div>
           </div>
         </div>
       </article>
 
       <!-- 2. FLEXION -->
-      <article class="card">
+      <article class="card reveal" style="transition-delay:0.08s">
         <div class="card-header">
-          <h2>2. Flexion d'une poutre</h2>
+          <div class="card-num">Module 02 · FEA</div>
+          <h2>Flexion d'une poutre</h2>
           <p>Poutre bi-appuyée chargée en son centre. La flèche varie en L³/EI. La carte thermique révèle la concentration des contraintes en fibre externe.</p>
         </div>
         <div class="controls">
           <div class="control"><label>Charge centrale <span id="beamLoadValue">30 kN</span></label><input id="beamLoad" type="range" min="5" max="80" value="30"/></div>
           <div class="control"><label>Portée <span id="beamSpanValue">4.0 m</span></label><input id="beamSpan" type="range" min="2" max="8" step="0.1" value="4"/></div>
-          <div class="control"><label>Hauteur de section <span id="beamHeightValue">220 mm</span></label><input id="beamHeight" type="range" min="120" max="400" value="220"/></div>
-          <div class="control"><label>Module de Young <span id="beamYoungValue">75 GPa</span></label><input id="beamYoung" type="range" min="20" max="210" value="75"/></div>
+          <div class="control"><label>Hauteur section <span id="beamHeightValue">220 mm</span></label><input id="beamHeight" type="range" min="120" max="400" value="220"/></div>
+          <div class="control"><label>Module Young <span id="beamYoungValue">75 GPa</span></label><input id="beamYoung" type="range" min="20" max="210" value="75"/></div>
         </div>
         <div class="stage">
           <svg id="beamSvg" viewBox="0 0 700 320"></svg>
           <div class="metrics">
-            <div class="metric"><span>Flèche maximale</span><strong id="beamDeflection">0 mm</strong></div>
-            <div class="metric"><span>Moment fléchissant max</span><strong id="beamMoment">0 kN·m</strong></div>
-            <div class="metric"><span>Niveau d'effort</span><strong id="beamCritical">Faible</strong></div>
+            <div class="metric"><span>Flèche max</span><strong id="beamDeflection">0 mm</strong></div>
+            <div class="metric"><span>Moment max</span><strong id="beamMoment">0 kN·m</strong></div>
+            <div class="metric"><span>Niveau</span><strong id="beamCritical">Faible</strong></div>
           </div>
         </div>
       </article>
 
-      <!-- 3. CFD CANAL -->
-      <article class="card">
+      <!-- 3. CFD -->
+      <article class="card reveal" style="transition-delay:0.12s">
         <div class="card-header">
-          <h2>3. Écoulement dans un canal convergent</h2>
+          <div class="card-num">Module 03 · CFD</div>
+          <h2>Écoulement dans un canal convergent</h2>
           <p>Écoulement incompressible dans un canal convergent. La vitesse augmente au col par conservation du débit — les lignes de courant virent au rouge au rétrécissement.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Vitesse d'entrée <span id="cfdSpeedValue">3.0 m/s</span></label><input id="cfdSpeed" type="range" min="1" max="10" step="0.1" value="3"/></div>
-          <div class="control"><label>Taux de rétrécissement <span id="cfdViscosityValue">5</span></label><input id="cfdViscosity" type="range" min="1" max="10" value="5"/></div>
-          <div class="control"><label>Hauteur du canal <span id="cfdObstacleValue">60 mm</span></label><input id="cfdObstacle" type="range" min="40" max="120" value="60"/></div>
-          <div class="control"><label>Intensité turbulente <span id="cfdTurbulenceValue">4</span></label><input id="cfdTurbulence" type="range" min="1" max="10" value="4"/></div>
+          <div class="control"><label>Vitesse entrée <span id="cfdSpeedValue">3.0 m/s</span></label><input id="cfdSpeed" type="range" min="1" max="10" step="0.1" value="3"/></div>
+          <div class="control"><label>Rétrécissement <span id="cfdViscosityValue">5</span></label><input id="cfdViscosity" type="range" min="1" max="10" value="5"/></div>
+          <div class="control"><label>Hauteur canal <span id="cfdObstacleValue">60 mm</span></label><input id="cfdObstacle" type="range" min="40" max="120" value="60"/></div>
+          <div class="control"><label>Turbulence <span id="cfdTurbulenceValue">1</span></label><input id="cfdTurbulence" type="range" min="1" max="10" value="1"/></div>
         </div>
         <div class="stage">
-          <canvas id="cfdCanvas" width="700" height="320"></canvas>
+          <svg id="cfdSvg" viewBox="0 0 700 340"></svg>
           <div class="metrics">
-            <div class="metric"><span>Vitesse maximale au col</span><strong id="cfdRe">0 m/s</strong></div>
-            <div class="metric"><span>Zone d'accélération</span><strong id="cfdWake">Col central</strong></div>
-            <div class="metric"><span>Code couleur</span><strong>Bleu lent → rouge rapide</strong></div>
+            <div class="metric"><span>Vitesse max</span><strong id="cfdRe">0 m/s</strong></div>
+            <div class="metric"><span>Rapport V_max/V₀</span><strong id="cfdWake">0</strong></div>
+            <div class="metric"><span>Rétrécissement</span><strong id="cfdNeck">0 %</strong></div>
           </div>
         </div>
       </article>
 
       <!-- 4. ENGRENAGES -->
-      <article class="card">
+      <article class="card reveal" style="transition-delay:0.16s">
         <div class="card-header">
-          <h2>4. Transmission par engrenages</h2>
+          <div class="card-num">Module 04 · Mécanismes</div>
+          <h2>Transmission par engrenages</h2>
           <p>Réducteur à deux pignons en prise. Le rapport Z₂/Z₁ fixe la réduction de vitesse et l'amplification du couple en sortie.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Dents — pignon moteur <span id="gear1TeethValue">18</span></label><input id="gear1Teeth" type="range" min="10" max="40" value="18"/></div>
-          <div class="control"><label>Dents — pignon récepteur <span id="gear2TeethValue">36</span></label><input id="gear2Teeth" type="range" min="12" max="80" value="36"/></div>
+          <div class="control"><label>Dents — moteur <span id="gear1TeethValue">18</span></label><input id="gear1Teeth" type="range" min="10" max="40" value="18"/></div>
+          <div class="control"><label>Dents — récepteur <span id="gear2TeethValue">36</span></label><input id="gear2Teeth" type="range" min="12" max="80" value="36"/></div>
           <div class="control"><label>Vitesse d'entrée <span id="gearSpeedValue">180 rpm</span></label><input id="gearSpeed" type="range" min="60" max="600" value="180"/></div>
         </div>
         <div class="stage">
           <svg id="gearSvg" viewBox="0 0 700 320"></svg>
           <div class="metrics">
-            <div class="metric"><span>Rapport de réduction</span><strong id="gearRatio">0</strong></div>
-            <div class="metric"><span>Vitesse de sortie</span><strong id="gearOutput">0 rpm</strong></div>
-            <div class="metric"><span>Couple de sortie</span><strong id="gearTorqueOut">0 N·m</strong></div>
+            <div class="metric"><span>Réduction</span><strong id="gearRatio">0</strong></div>
+            <div class="metric"><span>Vitesse sortie</span><strong id="gearOutput">0 rpm</strong></div>
+            <div class="metric"><span>Couple sortie</span><strong id="gearTorqueOut">0 N·m</strong></div>
           </div>
         </div>
       </article>
 
       <!-- 5. ROULEMENT -->
-      <article class="card">
+      <article class="card reveal" style="transition-delay:0.20s">
         <div class="card-header">
-          <h2>5. Roulement avec et sans glissement</h2>
+          <div class="card-num">Module 05 · Contact</div>
+          <h2>Roulement avec et sans glissement</h2>
           <p>Contact roue-sol selon Bekker. Quand la vitesse de jante diffère de la vitesse d'avance, un glissement apparaît — le frottement détermine l'empreinte et l'intensité des traces.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Vitesse de translation <span id="rollSpeedValue">3.0 m/s</span></label><input id="rollSpeed" type="range" min="0.5" max="8" step="0.1" value="3"/></div>
+          <div class="control"><label>Vitesse translation <span id="rollSpeedValue">3.0 m/s</span></label><input id="rollSpeed" type="range" min="0.5" max="8" step="0.1" value="3"/></div>
           <div class="control"><label>Vitesse angulaire <span id="rollOmegaValue">6.0 rad/s</span></label><input id="rollOmega" type="range" min="1" max="16" step="0.1" value="6"/></div>
-          <div class="control"><label>Rayon de la roue <span id="rollRadiusValue">0.50 m</span></label><input id="rollRadius" type="range" min="0.2" max="1.0" step="0.01" value="0.5"/></div>
-          <div class="control"><label>Coefficient de frottement <span id="rollFrictionValue">0.45</span></label><input id="rollFriction" type="range" min="0.05" max="1" step="0.01" value="0.45"/></div>
+          <div class="control"><label>Rayon roue <span id="rollRadiusValue">0.50 m</span></label><input id="rollRadius" type="range" min="0.2" max="1.0" step="0.01" value="0.5"/></div>
+          <div class="control"><label>Coeff. frottement <span id="rollFrictionValue">0.45</span></label><input id="rollFriction" type="range" min="0.05" max="1" step="0.01" value="0.45"/></div>
         </div>
         <div class="stage">
           <svg id="rollSvg" viewBox="0 0 700 320"></svg>
           <div class="metrics">
-            <div class="metric"><span>Taux de glissement</span><strong id="rollSlip">0 %</strong></div>
-            <div class="metric"><span>Régime de contact</span><strong id="rollMode">Roulement pur</strong></div>
-            <div class="metric"><span>Lecture</span><strong>Empreinte + traces de glissement</strong></div>
+            <div class="metric"><span>Glissement</span><strong id="rollSlip">0 %</strong></div>
+            <div class="metric"><span>Régime</span><strong id="rollMode">Roulement pur</strong></div>
+            <div class="metric"><span>Lecture</span><strong>Empreinte + traces</strong></div>
           </div>
         </div>
       </article>
 
       <!-- 6. AILE -->
-      <article class="card wing-card">
+      <article class="card wing-card reveal" style="transition-delay:0.24s">
         <div class="card-header">
-          <h2>6. Profil aérodynamique — portance et décrochage</h2>
+          <div class="card-num">Module 06 · Aérodynamique</div>
+          <h2>Profil aérodynamique — portance &amp; décrochage</h2>
           <p>Profil cambré en écoulement subsonique. La dépression sur l'extrados génère la portance. Au-delà de l'angle de décrochage, le décollement fait chuter brutalement C<sub>L</sub>.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Vitesse de l'écoulement <span id="wingSpeedValue">65 m/s</span></label><input id="wingSpeed" type="range" min="20" max="120" step="1" value="65"/></div>
+          <div class="control"><label>Vitesse écoulement <span id="wingSpeedValue">65 m/s</span></label><input id="wingSpeed" type="range" min="20" max="120" step="1" value="65"/></div>
           <div class="control"><label>Angle d'attaque <span id="wingAoAValue">8°</span></label><input id="wingAoA" type="range" min="-4" max="20" step="0.5" value="8"/></div>
-          <div class="control"><label>Cambrure du profil <span id="wingCamberValue">6 %</span></label><input id="wingCamber" type="range" min="0" max="12" step="0.5" value="6"/></div>
+          <div class="control"><label>Cambrure <span id="wingCamberValue">6 %</span></label><input id="wingCamber" type="range" min="0" max="12" step="0.5" value="6"/></div>
           <div class="control"><label>Surface alaire <span id="wingAreaValue">24 m²</span></label><input id="wingArea" type="range" min="8" max="40" step="1" value="24"/></div>
         </div>
         <div class="stage">
           <svg id="wingSvg" viewBox="0 0 700 320"></svg>
           <div class="metrics">
-            <div class="metric"><span>Portance générée</span><strong id="wingLift">0 kN</strong></div>
-            <div class="metric"><span>Coefficient de portance C<sub>L</sub></span><strong id="wingCl">0.00</strong></div>
-            <div class="metric"><span>État de l'écoulement</span><strong id="wingState">Attaché</strong></div>
+            <div class="metric"><span>Portance</span><strong id="wingLift">0 kN</strong></div>
+            <div class="metric"><span>Coeff. C<sub>L</sub></span><strong id="wingCl">0.00</strong></div>
+            <div class="metric"><span>État</span><strong id="wingState">Attaché</strong></div>
           </div>
         </div>
       </article>
 
+    </section>
+
+    <div class="section-title" style="margin-top: 12px;"><h3>Turbomachines</h3></div>
+
+    <section class="grid">
+
       <!-- 7. POMPE -->
-      <article class="card turbo-card pump-card">
-        <div class="card-header">
-          <h2>7. Pompe centrifuge</h2>
+      <article class="card turbo-card reveal">
+        <div class="turbo-header">
+          <div class="card-num">Module 07 · Turbomachine</div>
+          <h2>Pompe centrifuge</h2>
           <p>La roue en rotation communique de l'énergie au fluide par effet centrifuge — aspiration axiale au centre, refoulement tangentiel en périphérie.</p>
         </div>
         <div class="turbo-body">
           <div class="turbo-panel">
             <div class="turbo-controls">
-              <div class="turbo-control"><label>Vitesse de rotation <span id="pumpSpeedValue">1200 rpm</span></label><input id="pumpSpeed" type="range" min="200" max="3200" step="50" value="1200"/></div>
-              <div class="turbo-control"><label>Débit volumique <span id="pumpFlowValue">60 m³/h</span></label><input id="pumpFlow" type="range" min="5" max="220" step="1" value="60"/></div>
-              <div class="turbo-control"><label>Rayon de la roue <span id="pumpRadiusValue">0.34 m</span></label><input id="pumpRadius" type="range" min="0.12" max="0.75" step="0.01" value="0.34"/></div>
-              <div class="turbo-control"><label>Angle des aubes <span id="pumpAngleValue">24°</span></label><input id="pumpAngle" type="range" min="8" max="65" step="1" value="24"/></div>
+              <div class="turbo-control"><label>Rotation <span id="pumpSpeedValue">1200 rpm</span></label><input id="pumpSpeed" type="range" min="200" max="3200" step="50" value="1200"/></div>
+              <div class="turbo-control"><label>Débit <span id="pumpFlowValue">60 m³/h</span></label><input id="pumpFlow" type="range" min="5" max="220" step="1" value="60"/></div>
+              <div class="turbo-control"><label>Rayon roue <span id="pumpRadiusValue">0.34 m</span></label><input id="pumpRadius" type="range" min="0.12" max="0.75" step="0.01" value="0.34"/></div>
+              <div class="turbo-control"><label>Angle aubes <span id="pumpAngleValue">24°</span></label><input id="pumpAngle" type="range" min="8" max="65" step="1" value="24"/></div>
             </div>
           </div>
           <div class="turbo-stage">
             <svg id="pumpSvg" viewBox="0 0 700 340"></svg>
             <div class="turbo-metrics">
-              <div class="turbo-metric"><span>Hauteur manométrique</span><strong id="pumpH">0 m</strong></div>
+              <div class="turbo-metric"><span>Hm manométrique</span><strong id="pumpH">0 m</strong></div>
               <div class="turbo-metric"><span>Puissance absorbée</span><strong id="pumpP">0 kW</strong></div>
-              <div class="turbo-metric"><span>Vitesse périphérique u₂</span><strong id="pumpU">0 m/s</strong></div>
-              <div class="turbo-metric"><span>Vitesse absolue sortie</span><strong id="pumpV2">0 m/s</strong></div>
+              <div class="turbo-metric"><span>Vitesse u₂</span><strong id="pumpU">0 m/s</strong></div>
+              <div class="turbo-metric"><span>Vitesse V₂ sortie</span><strong id="pumpV2">0 m/s</strong></div>
             </div>
           </div>
         </div>
       </article>
 
       <!-- 8. TURBINE -->
-      <article class="card turbo-card turbine-card">
-        <div class="card-header">
-          <h2>8. Turbine radiale</h2>
+      <article class="card turbo-card reveal" style="transition-delay:0.08s">
+        <div class="turbo-header">
+          <div class="card-num">Module 08 · Turbomachine</div>
+          <h2>Turbine radiale</h2>
           <p>Le fluide sous pression entre tangentiellement et cède son énergie cinétique à la roue par variation de moment cinétique — puissance extraite sur l'arbre.</p>
         </div>
         <div class="turbo-body">
           <div class="turbo-panel">
             <div class="turbo-controls">
-              <div class="turbo-control"><label>Vitesse de rotation <span id="turbSpeedValue">900 rpm</span></label><input id="turbSpeed" type="range" min="400" max="1500" step="50" value="900"/></div>
-              <div class="turbo-control"><label>Débit volumique <span id="turbFlowValue">80 m³/h</span></label><input id="turbFlow" type="range" min="15" max="200" step="5" value="80"/></div>
-              <div class="turbo-control"><label>Rayon de la roue <span id="turbRadiusValue">0.40 m</span></label><input id="turbRadius" type="range" min="0.15" max="0.50" step="0.01" value="0.40"/></div>
-              <div class="turbo-control"><label>Angle des aubes <span id="turbAngleValue">22°</span></label><input id="turbAngle" type="range" min="12" max="50" step="1" value="22"/></div>
+              <div class="turbo-control"><label>Rotation <span id="turbSpeedValue">900 rpm</span></label><input id="turbSpeed" type="range" min="400" max="1500" step="50" value="900"/></div>
+              <div class="turbo-control"><label>Débit <span id="turbFlowValue">80 m³/h</span></label><input id="turbFlow" type="range" min="15" max="200" step="5" value="80"/></div>
+              <div class="turbo-control"><label>Rayon roue <span id="turbRadiusValue">0.40 m</span></label><input id="turbRadius" type="range" min="0.15" max="0.50" step="0.01" value="0.40"/></div>
+              <div class="turbo-control"><label>Angle aubes <span id="turbAngleValue">22°</span></label><input id="turbAngle" type="range" min="12" max="50" step="1" value="22"/></div>
             </div>
           </div>
           <div class="turbo-stage">
             <svg id="turbSvg" viewBox="0 0 700 340"></svg>
             <div class="turbo-metrics">
-              <div class="turbo-metric"><span>Vitesse du jet d'entrée</span><strong id="turbVjet">0 m/s</strong></div>
+              <div class="turbo-metric"><span>Vitesse jet</span><strong id="turbVjet">0 m/s</strong></div>
               <div class="turbo-metric"><span>Puissance utile</span><strong id="turbPu">0 kW</strong></div>
-              <div class="turbo-metric"><span>Couple sur l'arbre</span><strong id="turbC">0 N·m</strong></div>
-              <div class="turbo-metric"><span>Rendement hydraulique</span><strong id="turbEta">0 %</strong></div>
+              <div class="turbo-metric"><span>Couple arbre</span><strong id="turbC">0 N·m</strong></div>
+              <div class="turbo-metric"><span>Rendement η</span><strong id="turbEta">0 %</strong></div>
             </div>
           </div>
         </div>
@@ -325,14 +641,56 @@
 
     </section>
   </main>
-  <footer></footer>
-</div>
-<script>
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const colorMap=t=>{const c1=[29,78,216],c2=[34,211,238],c3=[250,204,21],c4=[249,115,22],c5=[220,38,38];const mix=(a,b,u)=>a.map((x,i)=>Math.round(x+(b[i]-x)*u));let c;if(t<.25)c=mix(c1,c2,t/.25);else if(t<.5)c=mix(c2,c3,(t-.25)/.25);else if(t<.75)c=mix(c3,c4,(t-.5)/.25);else c=mix(c4,c5,(t-.75)/.25);return`rgb(${c[0]},${c[1]},${c[2]})`;};
-function bv(id,fmt=v=>v){const inp=document.getElementById(id);const out=document.getElementById(id+'Value');const u=()=>out.innerHTML=fmt(inp.value);inp.addEventListener('input',u);u();return inp;}
 
-/* ── 1. TRACTION ── */
+  <footer>
+    <div class="footer-name">Tawakol · Master MAM</div>
+    <div class="footer-meta">Université Claude Bernard Lyon 1 · Simulations interactives<br>Modélisation et Applications en Mécanique</div>
+  </footer>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════════════════════ */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.06 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ════════════════════════════════════════════════
+   UTILITIES  (physique inchangée)
+════════════════════════════════════════════════ */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const colorMap=t=>{
+  const c1=[29,78,216],c2=[34,211,238],c3=[250,204,21],c4=[249,115,22],c5=[220,38,38];
+  const mix=(a,b,u)=>a.map((x,i)=>Math.round(x+(b[i]-x)*u));
+  let c;
+  if(t<.25)c=mix(c1,c2,t/.25);
+  else if(t<.5)c=mix(c2,c3,(t-.25)/.25);
+  else if(t<.75)c=mix(c3,c4,(t-.5)/.25);
+  else c=mix(c4,c5,(t-.75)/.25);
+  return`rgb(${c[0]},${c[1]},${c[2]})`;
+};
+function bv(id,fmt=v=>v){
+  const inp=document.getElementById(id);
+  const out=document.getElementById(id+'Value');
+  const u=()=>out.innerHTML=fmt(inp.value);
+  inp.addEventListener('input',u);u();
+  return inp;
+}
+
+/* ── SVG background helper ── */
+function svgBg(w=700, h=320) {
+  let g = '';
+  for(let i=0;i<=10;i++) g+=`<line x1="${i*w/10}" y1="0" x2="${i*w/10}" y2="${h}" stroke="rgba(255,255,255,0.028)" stroke-width="1"/>`;
+  for(let j=0;j<=6;j++) g+=`<line x1="0" y1="${j*h/6}" x2="${w}" y2="${j*h/6}" stroke="rgba(255,255,255,0.028)" stroke-width="1"/>`;
+  return g;
+}
+
+/* ══════════════════════════════════
+   1. TRACTION
+══════════════════════════════════ */
 const tractionForce=bv('tractionForce',v=>`${v} kN`);
 const tractionPoisson=bv('tractionPoisson',v=>Number(v).toFixed(2));
 const tractionThickness=bv('tractionThickness',v=>`${v} mm`);
@@ -350,19 +708,22 @@ function drawTraction(){
     const lhh=h*.5-lateralAmp*xn,yc=y0+h*.5,y=yc+(yn-.5)*2*lhh;
     const local=clamp(.14+.78*xn+.06*Math.abs(yn-.5),0,1);
     const x=x0+i*(w/cols)+xShift;
-    rects+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(w/cols+.9).toFixed(1)}" height="${(2*lhh/rows+.9).toFixed(1)}" fill="${colorMap(local)}" opacity=".95"/>`;
+    rects+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(w/cols+.9).toFixed(1)}" height="${(2*lhh/rows+.9).toFixed(1)}" fill="${colorMap(local)}" opacity=".92"/>`;
   }
   const cY=y0+h/2,aL=clamp(75+force,90,170),fX=x0+w+axialAmp;
-  svg.innerHTML=`<defs><marker id="ah" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#e2e8f0"/></marker></defs>
-  <rect x="60" y="55" width="26" height="170" rx="6" fill="#64748b"/>
-  <rect x="${x0-3}" y="${y0-6}" width="${w+axialAmp+10}" height="${h+12}" rx="10" fill="none" stroke="rgba(255,255,255,.16)"/>
+  svg.innerHTML=`<defs><marker id="ah" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#e74c3c"/></marker></defs>
+  ${svgBg(700,320)}
+  <rect x="60" y="55" width="26" height="170" rx="4" fill="#2a2f38" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <rect x="${x0-3}" y="${y0-6}" width="${w+axialAmp+10}" height="${h+12}" rx="8" fill="none" stroke="rgba(255,255,255,.10)"/>
   ${rects}
-  <line x1="${fX}" y1="${cY}" x2="${fX+aL}" y2="${cY}" stroke="#e2e8f0" stroke-width="6" marker-end="url(#ah)"/>
-  <text x="${fX+18}" y="${cY-22}" fill="#e2e8f0" font-size="16">F</text>
-  <text x="60" y="270" fill="#94a3b8" font-size="14">Allongement axial · contraction transversale (effet de Poisson)</text>`;
+  <line x1="${fX}" y1="${cY}" x2="${fX+aL}" y2="${cY}" stroke="#e74c3c" stroke-width="5" marker-end="url(#ah)"/>
+  <text x="${fX+18}" y="${cY-22}" fill="#e74c3c" font-size="15" font-family="Space Mono,monospace">F = ${force} kN</text>
+  <text x="60" y="298" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">Allongement axial · contraction transversale (effet de Poisson)</text>`;
 }
 
-/* ── 2. FLEXION ── */
+/* ══════════════════════════════════
+   2. FLEXION
+══════════════════════════════════ */
 const beamLoad=bv('beamLoad',v=>`${v} kN`);
 const beamSpan=bv('beamSpan',v=>`${Number(v).toFixed(1)} m`);
 const beamHeight=bv('beamHeight',v=>`${v} mm`);
@@ -377,82 +738,160 @@ function drawBeam(){
   const sX=80,eX=620,bY=135,amp=clamp(delta*10,12,95);
   let path=`M ${sX} ${bY}`,bands='',glowBands='',grid='';
   for(let i=0;i<=80;i++){const t=i/80,x=sX+(eX-sX)*t,y=bY+amp*Math.sin(Math.PI*t);path+=` L ${x.toFixed(2)} ${y.toFixed(2)}`;}
-  for(let i=0;i<=12;i++)grid+=`<line x1="34" y1="${54+i*18}" x2="666" y2="${54+i*18}" stroke="rgba(255,255,255,.035)" stroke-width="1"/>`;
+  for(let i=0;i<=12;i++)grid+=`<line x1="34" y1="${54+i*18}" x2="666" y2="${54+i*18}" stroke="rgba(255,255,255,.025)" stroke-width="1"/>`;
   for(let i=0;i<44;i++){
     const t=i/43,x=sX+(eX-sX)*t,ss=Math.sin(Math.PI*t);
     const level=clamp(.18+.82*ss*(.45+effortLevel*.75),0,1),c=colorMap(level);
     const y=bY+amp*Math.sin(Math.PI*t),lh=18+effortLevel*14+ss*10;
-    bands+=`<rect x="${x-7}" y="${y-lh/2}" width="16" height="${lh.toFixed(1)}" fill="${c}" rx="5" opacity=".96"/>`;
-    glowBands+=`<rect x="${x-11}" y="${y-lh/2-4}" width="24" height="${(lh+8).toFixed(1)}" fill="${c}" rx="8" opacity="${(.08+.13*effortLevel).toFixed(2)}"/>`;
+    bands+=`<rect x="${x-7}" y="${y-lh/2}" width="16" height="${lh.toFixed(1)}" fill="${c}" rx="4" opacity=".94"/>`;
+    glowBands+=`<rect x="${x-11}" y="${y-lh/2-4}" width="24" height="${(lh+8).toFixed(1)}" fill="${c}" rx="7" opacity="${(.05+.10*effortLevel).toFixed(2)}"/>`;
   }
   const bt=colorMap(clamp(.22+effortLevel*.78,0,1));
   const ct=effortLevel<.32?'Faible':effortLevel<.62?'Modéré':effortLevel<.85?'Élevé':'Critique';
   document.getElementById('beamCritical').textContent=ct;
-  svg.innerHTML=`<defs><linearGradient id="bStroke" x1="0" x2="1">
-    <stop offset="0%" stop-color="${colorMap(clamp(.10+effortLevel*.25,0,1))}"/>
-    <stop offset="50%" stop-color="${colorMap(clamp(.45+effortLevel*.35,0,1))}"/>
-    <stop offset="100%" stop-color="${colorMap(clamp(.10+effortLevel*.25,0,1))}"/>
-  </linearGradient><filter id="bGlow"><feGaussianBlur stdDeviation="7" result="blur"/></filter></defs>
-  <rect x="24" y="28" width="652" height="264" rx="20" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.05)"/>
+  svg.innerHTML=`<defs>
+    <linearGradient id="bStroke" x1="0" x2="1">
+      <stop offset="0%" stop-color="${colorMap(clamp(.10+effortLevel*.25,0,1))}"/>
+      <stop offset="50%" stop-color="${colorMap(clamp(.45+effortLevel*.35,0,1))}"/>
+      <stop offset="100%" stop-color="${colorMap(clamp(.10+effortLevel*.25,0,1))}"/>
+    </linearGradient>
+    <filter id="bGlow"><feGaussianBlur stdDeviation="7" result="blur"/></filter>
+  </defs>
+  ${svgBg(700,320)}
   ${grid}
-  <polygon points="70,190 95,190 82.5,210" fill="#64748b"/>
-  <polygon points="605,190 630,190 617.5,210" fill="#64748b"/>
-  <line x1="80" y1="190" x2="620" y2="190" stroke="rgba(148,163,184,.6)" stroke-width="2" stroke-dasharray="5 6"/>
-  <path d="${path}" fill="none" stroke="${bt}" stroke-width="18" stroke-linecap="round" opacity=".16" filter="url(#bGlow)"/>
+  <polygon points="70,190 95,190 82.5,210" fill="#3a3f48"/>
+  <polygon points="605,190 630,190 617.5,210" fill="#3a3f48"/>
+  <line x1="80" y1="190" x2="620" y2="190" stroke="rgba(255,255,255,.18)" stroke-width="2" stroke-dasharray="5 6"/>
+  <path d="${path}" fill="none" stroke="${bt}" stroke-width="18" stroke-linecap="round" opacity=".12" filter="url(#bGlow)"/>
   ${glowBands}${bands}
-  <path d="${path}" fill="none" stroke="url(#bStroke)" stroke-width="10" stroke-linecap="round"/>
-  <line x1="350" y1="35" x2="350" y2="105" stroke="#f8fafc" stroke-width="5"/>
-  <polygon points="340,95 360,95 350,115" fill="#f8fafc"/>
-  <text x="322" y="28" fill="#f8fafc" font-size="16">Charge P</text>
-  <text x="85" y="258" fill="#94a3b8" font-size="14">La flèche varie en L³ — doubler la portée multiplie la déformation par 8.</text>`;
+  <path d="${path}" fill="none" stroke="url(#bStroke)" stroke-width="9" stroke-linecap="round"/>
+  <line x1="350" y1="35" x2="350" y2="105" stroke="#e74c3c" stroke-width="4"/>
+  <polygon points="340,98 360,98 350,116" fill="#e74c3c"/>
+  <text x="318" y="28" fill="#e74c3c" font-size="13" font-family="Space Mono,monospace">P = ${P} kN</text>
+  <text x="85" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">La flèche varie en L³ — doubler la portée multiplie la déformation par 8.</text>`;
 }
 
-/* ── 3. CFD ── */
+/* ══════════════════════════════════
+   3. CFD
+══════════════════════════════════ */
 const cfdSpeed=bv('cfdSpeed',v=>`${Number(v).toFixed(1)} m/s`);
 const cfdViscosity=bv('cfdViscosity',v=>`${v}`);
 const cfdObstacle=bv('cfdObstacle',v=>`${v} mm`);
 const cfdTurbulence=bv('cfdTurbulence',v=>`${v}`);
-function drawCFD(){
-  const canvas=document.getElementById('cfdCanvas'),ctx=canvas.getContext('2d');
-  const flow=+cfdSpeed.value,neck=+cfdViscosity.value,chH=+cfdObstacle.value,mix=+cfdTurbulence.value;
-  const w=canvas.width,h=canvas.height;
-  ctx.clearRect(0,0,w,h);
-  const topBase=60,cx=w*.5,throatHalf=50-neck*3,entryHalf=chH+35;
-  const topWall=x=>{const d=Math.abs(x-cx)/170;return topBase+(entryHalf-throatHalf)*Math.exp(-d*d);};
-  const botWall=x=>h-topWall(x),gapAt=x=>botWall(x)-topWall(x);
-  ctx.fillStyle='rgba(5,10,25,1)';ctx.fillRect(0,0,w,h);
-  ctx.fillStyle='rgba(255,255,255,.04)';
-  ctx.beginPath();ctx.moveTo(0,0);for(let x=0;x<=w;x+=8)ctx.lineTo(x,topWall(x));ctx.lineTo(w,0);ctx.closePath();ctx.fill();
-  ctx.beginPath();ctx.moveTo(0,h);for(let x=0;x<=w;x+=8)ctx.lineTo(x,botWall(x));ctx.lineTo(w,h);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=3;
-  ctx.beginPath();for(let x=0;x<=w;x+=4){const y=topWall(x);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
-  ctx.beginPath();for(let x=0;x<=w;x+=4){const y=botWall(x);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
-  for(let j=0;j<16;j++){
-    const yn=j/15;ctx.beginPath();
-    for(let x=0;x<=w;x+=8){const top=topWall(x),gap=gapAt(x),wave=Math.sin((x/55)+j*.7)*mix*.3,y=top+yn*gap+wave;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
-    const t=j/15;ctx.strokeStyle=`rgba(${Math.round(50+180*t)},${Math.round(150-80*t)},255,0.9)`;ctx.lineWidth=2;ctx.stroke();
-  }
-  for(let i=0;i<120;i++){
-    const x=(i*20+Date.now()*.05*flow)%(w+20)-10,lane=i%14,yn=lane/13;
-    const top=topWall(x),gap=gapAt(x),cb=1-Math.pow(2*yn-1,2),accel=(2*entryHalf)/Math.max(gap,20);
-    const localSpeed=flow*(.5+.9*cb)*accel,y=top+yn*gap,t=Math.max(0,Math.min(1,localSpeed/12));
-    ctx.fillStyle=colorMap(t);ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
-  }
-  const vmax=flow*(2*entryHalf)/Math.max(2*throatHalf,20);
-  document.getElementById('cfdRe').textContent=`${vmax.toFixed(1)} m/s`;
-  document.getElementById('cfdWake').textContent='Col central';
-  const lg=ctx.createLinearGradient(470,22,650,22);
-  lg.addColorStop(0,'#1d4ed8');lg.addColorStop(.5,'#22d3ee');lg.addColorStop(.75,'#facc15');lg.addColorStop(1,'#ef4444');
-  ctx.fillStyle=lg;ctx.fillRect(470,28,180,12);
-  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.strokeRect(470,28,180,12);
-  ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='13px Arial';ctx.fillText('lent',470,20);ctx.fillText('rapide',612,20);
-}
+/* ── CFD particles persistent state ── */
+const cfdPts=[];
+(function(){for(let i=0;i<34;i++)cfdPts.push({x:(i/34)*700,yn:0.06+Math.random()*0.88});})();
 
-/* ── 4. ENGRENAGES ── */
+function drawCFD(ts){
+  const svg=document.getElementById('cfdSvg');
+  if(!svg)return;
+  const flow=+cfdSpeed.value,neck=+cfdViscosity.value,chH=+cfdObstacle.value,mix=+cfdTurbulence.value;
+  const W=700,H=340;
+  /* jet scientifique : bleu→cyan→vert→jaune→rouge
+     neck grand (canal large) → écart de vitesse faible → couleurs restent dans le bleu
+     neck petit (fort rétrécissement) → écart de vitesse élevé → tout le spectre jusqu'au rouge */
+  const neckNorm=clamp(neck/10,0,1); /* 0=rétrécissement faible, 1=fort */
+  const colorRange=0.15+0.85*neckNorm; /* plage de couleur utilisée : 0.15 (tout bleu) → 1.0 (bleu→rouge) */
+  const cfdColorMap=t=>{
+    const ts=clamp(t*colorRange,0,1);
+    const mx=(a,b,u)=>a.map((x,i)=>Math.round(x+(b[i]-x)*u));
+    const c1=[29,78,216],c2=[34,211,238],c3=[250,204,21],c4=[249,115,22],c5=[220,38,38];
+    let col;
+    if(ts<0.25)col=mx(c1,c2,ts/0.25);
+    else if(ts<0.50)col=mx(c2,c3,(ts-0.25)/0.25);
+    else if(ts<0.75)col=mx(c3,c4,(ts-0.50)/0.25);
+    else col=mx(c4,c5,(ts-0.75)/0.25);
+    return `rgb(${col[0]},${col[1]},${col[2]})`;
+  };
+  const cx=W/2,topBase=38,throatHalf=clamp(54-neck*3.8,12,54),entryHalf=clamp(chH+32,48,108);
+  const topY=x=>{const d=Math.abs(x-cx)/155;return topBase+(entryHalf-throatHalf)*Math.exp(-d*d);};
+  const botY=x=>H-topY(x);
+  const gapY=x=>botY(x)-topY(x);
+  const velAt=(x,yn)=>{const g=gapY(x),cb=1-Math.pow(clamp(2*yn-1,-1,1),2);return flow*(0.5+cb)*(2*entryHalf)/Math.max(g,12);};
+  const vmax=flow*(2*entryHalf)/Math.max(2*throatHalf,12);
+  const ratio=vmax/Math.max(flow,0.01);
+  const neckPct=Math.round((1-throatHalf/entryHalf)*100);
+  document.getElementById('cfdRe').textContent=`${vmax.toFixed(1)} m/s`;
+  document.getElementById('cfdWake').textContent=`${ratio.toFixed(2)}×`;
+  document.getElementById('cfdNeck').textContent=`${neckPct} %`;
+
+  /* parois — polygones SVG */
+  let topPts=`0,0`,botPts=`0,${H}`;
+  for(let x=0;x<=W;x+=6){topPts+=` ${x},${topY(x).toFixed(1)}`;botPts+=` ${x},${botY(x).toFixed(1)}`;}
+  topPts+=` ${W},0`;botPts+=` ${W},${H}`;
+
+  /* paroi path (ligne nette) */
+  let topLine='',botLine='';
+  for(let x=0;x<=W;x+=4){
+    const yt=topY(x).toFixed(1),yb=botY(x).toFixed(1);
+    topLine+=(x===0?`M 0 ${yt}`:`L ${x} ${yt}`);
+    botLine+=(x===0?`M 0 ${yb}`:`L ${x} ${yb}`);
+  }
+
+  /* lignes de courant SVG */
+  const NL=13;
+  let streamlines='';
+  for(let j=0;j<NL;j++){
+    const yn=(j+0.5)/NL;
+    const t=clamp(velAt(cx,yn)/(flow*5.2),0,1);
+    const col=cfdColorMap(t);
+    let pts='';
+    for(let x=0;x<=W;x+=6){
+      const tw=topY(x),gap=gapY(x);
+      const wave=Math.sin(x*0.026+(ts||0)*0.00055*flow+j*1.15)*mix*0.55;
+      const y=(tw+yn*gap+wave).toFixed(1);
+      pts+=(x===0?`M 0 ${y}`:`L ${x} ${y}`);
+    }
+    streamlines+=`<path d="${pts}" fill="none" stroke="${col}" stroke-width="1.7" opacity="0.82"/>`;
+  }
+
+  /* particules */
+  const dt=0.016;
+  let circles='';
+  for(const p of cfdPts){
+    const tw=topY(p.x),gap=gapY(p.x);
+    const v=velAt(p.x,p.yn);
+    p.x+=v*dt*13;
+    p.yn=clamp(p.yn+(Math.random()-0.5)*mix*0.011,0.05,0.95);
+    if(p.x>W+4)p.x=0;
+    const py=tw+p.yn*gap;
+    if(py<tw+2||py>botY(p.x)-2)continue;
+    const col=cfdColorMap(clamp(v/(flow*5.2),0,1));
+    circles+=`<circle cx="${p.x.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="${col}" opacity="0.9"/>`;
+  }
+
+  svg.innerHTML=`<defs>
+    <linearGradient id="cfdLg" x1="0" x2="1"><stop offset="0%" stop-color="rgb(29,78,216)"/><stop offset="25%" stop-color="rgb(34,211,238)"/><stop offset="50%" stop-color="rgb(250,204,21)"/><stop offset="75%" stop-color="rgb(249,115,22)"/><stop offset="100%" stop-color="rgb(220,38,38)"/></linearGradient>
+    <clipPath id="cfdClip"><polygon points="${topPts}" clip-rule="evenodd"/></clipPath>
+  </defs>
+  ${svgBg(W,H)}
+  <polygon points="${topPts}" fill="#0c0d0f"/>
+  <polygon points="${botPts}" fill="#0c0d0f"/>
+  ${streamlines}
+  ${circles}
+  <path d="${topLine}" fill="none" stroke="rgba(0,229,255,0.18)" stroke-width="7" stroke-linecap="round"/>
+  <path d="${botLine}" fill="none" stroke="rgba(0,229,255,0.18)" stroke-width="7" stroke-linecap="round"/>
+  <path d="${topLine}" fill="none" stroke="rgba(125,211,252,0.95)" stroke-width="2" stroke-linecap="round"/>
+  <path d="${botLine}" fill="none" stroke="rgba(125,211,252,0.95)" stroke-width="2" stroke-linecap="round"/>
+  <rect x="506" y="18" width="168" height="6" rx="3" fill="url(#cfdLg)"/>
+  <rect x="506" y="18" width="168" height="6" rx="3" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+  <text x="506" y="14" fill="rgba(255,255,255,0.55)" font-size="10" font-family="Space Mono,monospace">lent</text>
+  <text x="640" y="14" fill="rgba(255,255,255,0.55)" font-size="10" font-family="Space Mono,monospace">rapide</text>
+  <text x="14" y="${H-12}" fill="#3a3f48" font-size="11" font-family="DM Sans,sans-serif">V_max = ${vmax.toFixed(1)} m/s au col · conservation du débit</text>`;
+}
+(function cfdLoop(t){drawCFD(t);requestAnimationFrame(cfdLoop);})();
+
+/* ══════════════════════════════════
+   4. ENGRENAGES
+══════════════════════════════════ */
 const gear1Teeth=bv('gear1Teeth',v=>`${v}`);
 const gear2Teeth=bv('gear2Teeth',v=>`${v}`);
 const gearSpeed=bv('gearSpeed',v=>`${v} rpm`);
-function gearPath(cx,cy,r,teeth,phase){let d='';const total=teeth*2;for(let i=0;i<=total;i++){const a=phase+(i/total)*Math.PI*2,rr=i%2===0?r*1.12:r*.9,x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);d+=i===0?`M ${x} ${y}`:`  L ${x} ${y}`;}return d+' Z';}
+function gearPath(cx,cy,r,teeth,phase){
+  let d='';const total=teeth*2;
+  for(let i=0;i<=total;i++){const a=phase+(i/total)*Math.PI*2,rr=i%2===0?r*1.12:r*.9,x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);d+=i===0?`M ${x} ${y}`:`  L ${x} ${y}`;}
+  return d+' Z';
+}
 function drawGears(){
   const svg=document.getElementById('gearSvg');
   const z1=+gear1Teeth.value,z2=+gear2Teeth.value,n1=+gearSpeed.value;
@@ -461,22 +900,33 @@ function drawGears(){
   document.getElementById('gearRatio').textContent=`1 : ${(1/ratio).toFixed(2)}`;
   document.getElementById('gearOutput').textContent=`${out.toFixed(1)} rpm`;
   document.getElementById('gearTorqueOut').textContent=`${T2.toFixed(1)} N·m`;
-  const r1=45+z1*1.4,r2=45+z2*1.0,c1x=220,c2x=220+r1+r2-10,cy=160,phase=Date.now()/800;
+  const r1=45+z1*1.4,r2=45+z2*1.0,c1x=215,c2x=215+r1+r2-10,cy=158,phase=Date.now()/800;
+  // Glow
   svg.innerHTML=`
-  <path d="${gearPath(c1x,cy,r1,z1,phase)}" fill="rgba(56,189,248,.16)" stroke="#38bdf8" stroke-width="3"/>
-  <path d="${gearPath(c2x,cy,r2,z2,-phase*ratio)}" fill="rgba(139,92,246,.16)" stroke="#8b5cf6" stroke-width="3"/>
-  <circle cx="${c1x}" cy="${cy}" r="16" fill="#e2e8f0"/>
-  <circle cx="${c2x}" cy="${cy}" r="16" fill="#e2e8f0"/>
-  <line x1="${c1x}" y1="${cy}" x2="${c1x+r1*.7*Math.cos(phase)}" y2="${cy+r1*.7*Math.sin(phase)}" stroke="#f8fafc" stroke-width="4"/>
-  <line x1="${c2x}" y1="${cy}" x2="${c2x+r2*.7*Math.cos(-phase*ratio)}" y2="${cy+r2*.7*Math.sin(-phase*ratio)}" stroke="#f8fafc" stroke-width="4"/>
-  <text x="${c1x-18}" y="${cy+r1+28}" fill="#7dd3fc" font-size="13">Z₁ = ${z1}</text>
-  <text x="${c2x-18}" y="${cy+r2+28}" fill="#c4b5fd" font-size="13">Z₂ = ${z2}</text>
-  <text x="70" y="36" fill="#e2e8f0" font-size="16" font-weight="600">Réducteur d'engrenages</text>
-  <text x="70" y="285" fill="#94a3b8" font-size="14">Plus Z₂/Z₁ augmente, plus la sortie ralentit et le couple de sortie s'amplifie.</text>`;
+  <defs>
+    <radialGradient id="g1g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(232,232,232,0.18)"/><stop offset="100%" stop-color="rgba(232,232,232,0)"/></radialGradient>
+    <radialGradient id="g2g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(231,76,60,0.18)"/><stop offset="100%" stop-color="rgba(231,76,60,0)"/></radialGradient>
+    <filter id="gglow"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  ${svgBg(700,320)}
+  <circle cx="${c1x}" cy="${cy}" r="${r1+20}" fill="url(#g1g)"/>
+  <circle cx="${c2x}" cy="${cy}" r="${r2+20}" fill="url(#g2g)"/>
+  <path d="${gearPath(c1x,cy,r1,z1,phase)}" fill="rgba(232,232,232,.12)" stroke="#e8e8e8" stroke-width="2.5"/>
+  <path d="${gearPath(c2x,cy,r2,z2,-phase*ratio)}" fill="rgba(231,76,60,.12)" stroke="#e74c3c" stroke-width="2.5"/>
+  <circle cx="${c1x}" cy="${cy}" r="14" fill="#181b1f" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <circle cx="${c2x}" cy="${cy}" r="14" fill="#181b1f" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <line x1="${c1x}" y1="${cy}" x2="${c1x+r1*.7*Math.cos(phase)}" y2="${cy+r1*.7*Math.sin(phase)}" stroke="rgba(255,255,255,0.55)" stroke-width="3"/>
+  <line x1="${c2x}" y1="${cy}" x2="${c2x+r2*.7*Math.cos(-phase*ratio)}" y2="${cy+r2*.7*Math.sin(-phase*ratio)}" stroke="rgba(255,255,255,0.55)" stroke-width="3"/>
+  <text x="${c1x-22}" y="${cy+r1+30}" fill="#e8e8e8" font-size="12" font-family="Space Mono,monospace">Z₁ = ${z1}</text>
+  <text x="${c2x-22}" y="${cy+r2+30}" fill="#e74c3c" font-size="12" font-family="Space Mono,monospace">Z₂ = ${z2}</text>
+  <text x="70" y="32" fill="#7a808c" font-size="11" font-family="Space Mono,monospace">RÉDUCTEUR</text>
+  <text x="70" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">Plus Z₂/Z₁ augmente, plus la sortie ralentit et le couple de sortie s'amplifie.</text>`;
   requestAnimationFrame(drawGears);
 }
 
-/* ── 5. ROULEMENT ── */
+/* ══════════════════════════════════
+   5. ROULEMENT
+══════════════════════════════════ */
 const rollSpeed=bv('rollSpeed',v=>`${Number(v).toFixed(1)} m/s`);
 const rollOmega=bv('rollOmega',v=>`${Number(v).toFixed(1)} rad/s`);
 const rollRadius=bv('rollRadius',v=>`${Number(v).toFixed(2)} m`);
@@ -488,33 +938,42 @@ function drawRolling(){
   const mode=v<=ideal?(effSlip<.08?'Accélération — roulement pur':'Accélération + glissement'):(effSlip<.08?'Freinage — roulement pur':'Freinage + glissement');
   document.getElementById('rollSlip').textContent=`${slipPct.toFixed(1)} %`;
   document.getElementById('rollMode').textContent=mode;
-  const rPx=60+r*40,cx=250,cy=150,gY=cy+rPx+15,angle=Date.now()/500*omega*.2;
+  const rPx=60+r*40,cx=250,cy=148,gY=cy+rPx+15,angle=Date.now()/500*omega*.2;
   const sink=6+effSlip*20*(1.08-mu*.35),traceScale=effSlip*(1.2-mu*.3),patchW=rPx*(.42+mu*.28),skidDir=v>=ideal?1:-1;
   let traces='';
-  for(let i=0;i<24;i++){const tx=cx-i*(16+traceScale*8)*skidDir,fade=1-i/24,depth=2+traceScale*16*fade;traces+=`<ellipse cx="${tx}" cy="${gY+2}" rx="${8+depth}" ry="${2.4+depth*.36}" fill="rgba(90,50,30,${((.14+traceScale*.55)*fade).toFixed(3)})"/>`;}
+  for(let i=0;i<24;i++){const tx=cx-i*(16+traceScale*8)*skidDir,fade=1-i/24,depth=2+traceScale*16*fade;traces+=`<ellipse cx="${tx}" cy="${gY+2}" rx="${8+depth}" ry="${2.4+depth*.36}" fill="rgba(230,210,175,${((.18+traceScale*.60)*fade).toFixed(3)})"/>`;}
   let particles='';
-  if(effSlip>.12)for(let i=0;i<10;i++){const px=cx-skidDir*(8+Math.random()*42),py=gY-Math.random()*(8+effSlip*24),pr=1.2+Math.random()*1.8;particles+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="rgba(148,101,60,${(.25+effSlip*.45).toFixed(2)})"/>`;}
-  svg.innerHTML=`<defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0%" stop-color="rgba(124,90,58,.95)"/><stop offset="100%" stop-color="rgba(89,63,41,.98)"/></linearGradient></defs>
-  <rect x="0" y="${gY}" width="700" height="80" fill="url(#gg)"/>
-  <line x1="0" y1="${gY}" x2="700" y2="${gY}" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
-  <ellipse cx="${cx}" cy="${gY+1}" rx="${patchW}" ry="${sink}" fill="rgba(15,23,42,.36)"/>
+  if(effSlip>.12)for(let i=0;i<10;i++){const px=cx-skidDir*(8+Math.random()*42),py=gY-Math.random()*(8+effSlip*24),pr=1.2+Math.random()*1.8;particles+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="rgba(240,225,195,${(.55+effSlip*.45).toFixed(2)})"/>`;}
+  svg.innerHTML=`
+  <defs>
+    <linearGradient id="gg2" x1="0" x2="1"><stop offset="0%" stop-color="rgba(30,34,40,0.98)"/><stop offset="100%" stop-color="rgba(24,27,32,0.98)"/></linearGradient>
+    <radialGradient id="wheelGrad" cx="40%" cy="38%" r="62%"><stop offset="0%" stop-color="rgba(232,232,232,0.20)"/><stop offset="100%" stop-color="rgba(232,232,232,0)"/></radialGradient>
+    <filter id="rglow"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  ${svgBg(700,320)}
+  <rect x="0" y="${gY}" width="700" height="80" fill="url(#gg2)"/>
+  <line x1="0" y1="${gY}" x2="700" y2="${gY}" stroke="rgba(231,76,60,0.22)" stroke-width="1.5"/>
+  <ellipse cx="${cx}" cy="${gY+1}" rx="${patchW}" ry="${sink}" fill="rgba(12,13,15,.55)"/>
   ${traces}${particles}
-  <circle cx="${cx}" cy="${cy}" r="${rPx}" fill="rgba(56,189,248,.16)" stroke="#38bdf8" stroke-width="5"/>
-  <circle cx="${cx}" cy="${cy}" r="${rPx*.72}" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
-  <circle cx="${cx}" cy="${cy}" r="10" fill="#fff"/>
-  <line x1="${cx}" y1="${cy}" x2="${cx+rPx*Math.cos(angle)}" y2="${cy+rPx*Math.sin(angle)}" stroke="#fff" stroke-width="4"/>
-  <line x1="${cx-120}" y1="${cy-64}" x2="${cx-20}" y2="${cy-64}" stroke="#22c55e" stroke-width="5"/>
-  <polygon points="${cx-20},${cy-64} ${cx-34},${cy-72} ${cx-34},${cy-56}" fill="#e2e8f0"/>
-  <text x="${cx-138}" y="${cy-74}" fill="#e2e8f0" font-size="13">v = ${v.toFixed(1)} m/s</text>
-  <rect x="470" y="42" width="175" height="90" rx="14" fill="rgba(15,23,42,.76)" stroke="rgba(255,255,255,.08)"/>
-  <text x="486" y="66" fill="#e2e8f0" font-size="14">μ = ${mu.toFixed(2)}</text>
-  <text x="486" y="88" fill="#94a3b8" font-size="13">Glissement : ${slipPct.toFixed(1)} %</text>
-  <text x="486" y="110" fill="#fde68a" font-size="12">${mode.split(' — ')[0]}</text>
-  <text x="40" y="290" fill="#94a3b8" font-size="13">L'empreinte de contact s'élargit avec μ · les traces au sol révèlent l'intensité du glissement.</text>`;
+  <circle cx="${cx}" cy="${cy}" r="${rPx+12}" fill="url(#wheelGrad)"/>
+  <circle cx="${cx}" cy="${cy}" r="${rPx}" fill="rgba(232,232,232,.08)" stroke="#e8e8e8" stroke-width="4"/>
+  <circle cx="${cx}" cy="${cy}" r="${rPx*.72}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.10)" stroke-width="1.5"/>
+  <circle cx="${cx}" cy="${cy}" r="9" fill="#0c0d0f" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+  <line x1="${cx}" y1="${cy}" x2="${cx+rPx*Math.cos(angle)}" y2="${cy+rPx*Math.sin(angle)}" stroke="rgba(255,255,255,0.5)" stroke-width="3.5"/>
+  <line x1="${cx-120}" y1="${cy-62}" x2="${cx-20}" y2="${cy-62}" stroke="#e74c3c" stroke-width="4"/>
+  <polygon points="${cx-20},${cy-62} ${cx-34},${cy-70} ${cx-34},${cy-54}" fill="#e74c3c"/>
+  <text x="${cx-138}" y="${cy-72}" fill="#e74c3c" font-size="12" font-family="Space Mono,monospace">v = ${v.toFixed(1)} m/s</text>
+  <rect x="468" y="38" width="192" height="96" rx="10" fill="rgba(12,13,15,0.90)" stroke="rgba(255,255,255,.07)"/>
+  <text x="484" y="62" fill="#eceef2" font-size="13" font-family="Space Mono,monospace">μ = ${mu.toFixed(2)}</text>
+  <text x="484" y="84" fill="#7a808c" font-size="12" font-family="Space Mono,monospace">slip : ${slipPct.toFixed(1)} %</text>
+  <text x="484" y="106" fill="#fbbf24" font-size="11" font-family="DM Sans,sans-serif">${mode.split(' — ')[0]}</text>
+  <text x="36" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">L'empreinte de contact s'élargit avec μ · les traces révèlent l'intensité du glissement.</text>`;
   requestAnimationFrame(drawRolling);
 }
 
-/* ── 6. AILE ── */
+/* ══════════════════════════════════
+   6. AILE
+══════════════════════════════════ */
 const wingSpeed=bv('wingSpeed',v=>`${Number(v).toFixed(0)} m/s`);
 const wingAoA=bv('wingAoA',v=>`${Number(v).toFixed(1).replace('.0','')}°`);
 const wingCamber=bv('wingCamber',v=>`${Number(v).toFixed(1).replace('.0','')} %`);
@@ -527,18 +986,27 @@ function drawWing(){
   if(isStall)clBase*=clamp(1-(aoa-stallAngle)*.10,.48,1);
   const cl=clamp(clBase,-.9,1.9),lift=.5*rho*speed*speed*area*cl/1000;
   let state='Écoulement attaché';
-  if(deepLow)state='Portance inversée';else if(nearZero)state='Portance quasi nulle';else if(isStall)state='Décrochage';else if(aoa>stallAngle-2)state='Pré-décrochage';
+  if(deepLow)state='Descente';else if(nearZero)state='Portance quasi nulle';else if(isStall)state='Décrochage';else if(aoa>stallAngle-2)state='Pré-décrochage';
   document.getElementById('wingLift').textContent=`${lift.toFixed(1)} kN`;
   document.getElementById('wingCl').textContent=`${cl.toFixed(2)}`;
   document.getElementById('wingState').textContent=state;
+  const stEl=document.getElementById('wingState');
+  const preStallChk=aoa>stallAngle-2&&!isStall;
+  stEl.style.color=deepLow?'#f97316':isStall?'#38bdf8':preStallChk?'#38bdf8':'#e8e8e8';
   const cx=342,cy=172,chord=278,angle=aoa*Math.PI/180,phase=Date.now()*(.0010+speed*.000045);
   const speedLevel=clamp(speed/120,0,1),energy=clamp(Math.abs(cl)*.55+speedLevel*.6,.12,1),tunnelPulse=.5+.5*Math.sin(phase*.9),liftMag=clamp(18+Math.abs(lift)*.28,24,56);
   const topPS=deepLow?.90:isStall?.76:clamp(.24+.56*speedLevel+.018*Math.max(0,aoa),.24,.94);
   const botPS=deepLow?.22:isStall?.58:clamp(.26+.30*speedLevel+.15*Math.max(0,aoa/10),.24,.82);
-  const topColor=deepLow?'#ff4d6d':isStall?'#ff7a00':'#00e5ff';
-  const botColor=deepLow?'#3b82f6':isStall?'#ffd166':'#ffb703';
-  const liftColor=cl>=0?'#22c55e':'#ef4444';
-  const auraColor=deepLow?'rgba(244,114,182,.18)':isStall?'rgba(251,146,60,.18)':'rgba(34,211,238,.16)';
+  const preStall=aoa>stallAngle-2&&!isStall;
+  /* Physique pression : chaud=haute pression, froid=basse pression
+     Normal    : extrados (haut) = basse pression → bleu cyan  / intrados (bas) = haute pression → rouge orange
+     Pré-décroch: extrados = très basse pression → bleu vif   / intrados = pression élevée → orange
+     Décrochage : extrados = pression effondrée → violet froid / intrados = pression désorganisée → jaune trouble
+     Inversé    : extrados = haute pression → rouge            / intrados = basse pression → bleu */
+  const topColor=deepLow?'#f97316':isStall?'#38bdf8':preStall?'#38bdf8':'#e8e8e8';
+  const botColor=deepLow?'#38bdf8':isStall?'#fbbf24':preStall?'#fb923c':'#f97316';
+  const liftColor=cl>=0?'#f97316':'#38bdf8';
+  const auraColor=deepLow?'rgba(249,115,22,.15)':isStall?'rgba(56,189,248,.15)':preStall?'rgba(56,189,248,.13)':'rgba(232,232,232,.10)';
   const rotate=(x,y)=>({x:cx+x*Math.cos(angle)-y*Math.sin(angle),y:cy+x*Math.sin(angle)+y*Math.cos(angle)});
   let profile='';const uP=[],lP=[];
   for(let i=0;i<=54;i++){const t=i/54,x=-chord*.5+t*chord,cLine=-camber*1.9*Math.sin(Math.PI*t),yt=-(5+17*Math.sin(Math.PI*t)*(.84-.27*t)),p=rotate(x,cLine+yt);uP.push(p);profile+=(i===0?'M ':' L ')+p.x.toFixed(2)+' '+p.y.toFixed(2);}
@@ -546,8 +1014,8 @@ function drawWing(){
   profile+=' Z';
   const pL=(d,w,c,op,dash='')=>`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" opacity="${op}" ${dash?`stroke-dasharray="${dash}"`:''}/>`; 
   let tGrid='';
-  for(let i=0;i<=10;i++)tGrid+=`<line x1="${44+i*58}" y1="34" x2="${44+i*58}" y2="286" stroke="rgba(255,255,255,.045)" stroke-width="1"/>`;
-  for(let j=0;j<=6;j++)tGrid+=`<line x1="34" y1="${52+j*34}" x2="666" y2="${52+j*34}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
+  for(let i=0;i<=10;i++)tGrid+=`<line x1="${44+i*58}" y1="34" x2="${44+i*58}" y2="286" stroke="rgba(255,255,255,.028)" stroke-width="1"/>`;
+  for(let j=0;j<=6;j++)tGrid+=`<line x1="34" y1="${52+j*34}" x2="666" y2="${52+j*34}" stroke="rgba(255,255,255,.028)" stroke-width="1"/>`;
   let gTrails='',sLines='',parts='',vField='';const fC=17;
   for(let j=0;j<fC;j++){
     const yn=j/(fC-1),uBand=yn<.5,xS=38,yB=58+yn*196;let d='',px=null,py=null;
@@ -564,59 +1032,54 @@ function drawWing(){
       d+=x===xS?`M ${x.toFixed(2)} ${y.toFixed(2)}`:`  L ${x.toFixed(2)} ${y.toFixed(2)}`;
       const pulse=((phase*88+j*38)%640)+22;
       if(Math.abs(x-pulse)<4){px=x;py=y;}
-      if(x>cx-110&&x<cx+120&&j%2===0&&x%21===0){const vL=clamp(5+sA*12+speedLevel*10,6,18);vField+=`<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+vL).toFixed(1)}" y2="${y.toFixed(1)}" stroke="${uBand?topColor:botColor}" stroke-width="1.7" opacity=".34"/>`;}
+      if(x>cx-110&&x<cx+120&&j%2===0&&x%21===0){const vL=clamp(5+sA*12+speedLevel*10,6,18);vField+=`<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+vL).toFixed(1)}" y2="${y.toFixed(1)}" stroke="${uBand?topColor:botColor}" stroke-width="1.5" opacity=".28"/>`;}
     }
     const lC=uBand?topColor:botColor;
-    gTrails+=pL(d,uBand?8:6.5,auraColor,uBand?.90:.72);
-    sLines+=pL(d,uBand?2.4:2.1,lC,uBand?.94:.82);
-    if(px!==null)parts+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${uBand?3.0:2.6}" fill="${lC}" opacity=".96"/>`;
+    gTrails+=pL(d,uBand?8:6.5,auraColor,uBand?.85:.68);
+    sLines+=pL(d,uBand?2.2:2.0,lC,uBand?.90:.78);
+    if(px!==null)parts+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${uBand?2.8:2.4}" fill="${lC}" opacity=".92"/>`;
   }
   let pTop='';
-  for(let i=5;i<uP.length-5;i+=5){const p=uP[i],len=5+12*topPS+4*speedLevel,dir=deepLow?1:-1;pTop+=`<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${(p.y+dir*len).toFixed(1)}" stroke="${topColor}" stroke-width="2.6" stroke-linecap="round" opacity=".82"/>`;}
+  for(let i=5;i<uP.length-5;i+=5){const p=uP[i],len=5+12*topPS+4*speedLevel,dir=deepLow?1:-1;pTop+=`<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${(p.y+dir*len).toFixed(1)}" stroke="${topColor}" stroke-width="2.4" stroke-linecap="round" opacity=".78"/>`;}
   let pBot='';
-  for(let i=5;i<lP.length-5;i+=5){const p=lP[i],len=5+10*botPS+3*speedLevel,dir=deepLow?-1:1;pBot+=`<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${(p.y+dir*len).toFixed(1)}" stroke="${botColor}" stroke-width="2.5" stroke-linecap="round" opacity=".78"/>`;}
+  for(let i=5;i<lP.length-5;i+=5){const p=lP[i],len=5+10*botPS+3*speedLevel,dir=deepLow?-1:1;pBot+=`<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${(p.y+dir*len).toFixed(1)}" stroke="${botColor}" stroke-width="2.2" stroke-linecap="round" opacity=".72"/>`;}
   let wakeCloud='';
-  if(isStall)for(let i=0;i<11;i++){const wx=cx+96+i*18,wy=cy-30+Math.sin(phase*2+i*.8)*(7+i*.75)+i*1.8;wakeCloud+=`<circle cx="${wx.toFixed(1)}" cy="${wy.toFixed(1)}" r="${(8+i*1.3).toFixed(1)}" fill="rgba(251,146,60,${(0.05+i*0.022).toFixed(2)})"/>`;}
+  if(isStall)for(let i=0;i<11;i++){const wx=cx+96+i*18,wy=cy-30+Math.sin(phase*2+i*.8)*(7+i*.75)+i*1.8;wakeCloud+=`<circle cx="${wx.toFixed(1)}" cy="${wy.toFixed(1)}" r="${(8+i*1.3).toFixed(1)}" fill="rgba(56,189,248,${(0.04+i*0.018).toFixed(2)})"/>`;}
   const aRX=132+44*Math.cos(-angle),aRY=228+44*Math.sin(-angle),arcEX=132+28*Math.cos(-angle),arcEY=228+28*Math.sin(-angle);
-  const stText=deepLow?'Incidence négative — dépression inversée, résultante vers le bas':isStall?'Décrochage — séparation du flux, sillage tourbillonnaire':aoa>stallAngle-2?'Pré-décrochage — fort gradient de pression, écoulement instable':'Écoulement attaché — dépression extrados, portance stable';
+  const stText=deepLow?'État : Descente — résultante vers le bas, portance inversée':isStall?'État : Décrochage — séparation du flux, sillage tourbillonnaire':aoa>stallAngle-2?'État : Pré-décrochage — fort gradient de pression':'État : Écoulement attaché — dépression extrados, portance stable';
   svg.innerHTML=`<defs>
-    <linearGradient id="wBW" x1="0" x2="1"><stop offset="0%" stop-color="rgba(255,255,255,.22)"/><stop offset="48%" stop-color="rgba(186,230,253,.20)"/><stop offset="100%" stop-color="rgba(255,255,255,.08)"/></linearGradient>
-    <linearGradient id="wSW" x1="0" x2="1"><stop offset="0%" stop-color="#f8fafc"/><stop offset="52%" stop-color="#7dd3fc"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient>
-    <radialGradient id="wA3" cx="50%" cy="48%" r="72%"><stop offset="0%" stop-color="${auraColor}"/><stop offset="55%" stop-color="rgba(139,92,246,.08)"/><stop offset="100%" stop-color="rgba(15,23,42,0)"/></radialGradient>
-    <linearGradient id="wTG" x1="0" x2="1"><stop offset="0%" stop-color="rgba(56,189,248,0)"/><stop offset="50%" stop-color="rgba(56,189,248,${(.08+energy*.10).toFixed(2)})"/><stop offset="100%" stop-color="rgba(139,92,246,0)"/></linearGradient>
+    <linearGradient id="wBW" x1="0" x2="1"><stop offset="0%" stop-color="rgba(255,255,255,.20)"/><stop offset="48%" stop-color="rgba(186,230,253,.16)"/><stop offset="100%" stop-color="rgba(255,255,255,.06)"/></linearGradient>
+    <linearGradient id="wSW" x1="0" x2="1"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="52%" stop-color="#e8e8e8"/><stop offset="100%" stop-color="#e74c3c"/></linearGradient>
+    <radialGradient id="wA3" cx="50%" cy="48%" r="72%"><stop offset="0%" stop-color="${auraColor}"/><stop offset="55%" stop-color="rgba(231,76,60,.05)"/><stop offset="100%" stop-color="rgba(12,13,15,0)"/></radialGradient>
+    <linearGradient id="wTG" x1="0" x2="1"><stop offset="0%" stop-color="rgba(232,232,232,0)"/><stop offset="50%" stop-color="rgba(232,232,232,${(.06+energy*.09).toFixed(2)})"/><stop offset="100%" stop-color="rgba(231,76,60,0)"/></linearGradient>
     <marker id="fAW" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#e2e8f0"/></marker>
-    <filter id="wSG3"><feGaussianBlur stdDeviation="9" result="blur"/></filter>
+    <filter id="wSG3"><feGaussianBlur stdDeviation="8" result="blur"/></filter>
   </defs>
-  <rect x="22" y="24" width="656" height="272" rx="22" fill="rgba(255,255,255,.028)" stroke="rgba(255,255,255,.06)"/>
-  <rect x="22" y="24" width="656" height="272" rx="22" fill="url(#wA3)"/>
-  <rect x="38" y="40" width="624" height="240" rx="18" fill="rgba(2,6,23,.20)" stroke="rgba(255,255,255,.045)"/>
   ${tGrid}
-  <ellipse cx="${cx}" cy="${cy+2}" rx="${(158+speedLevel*18).toFixed(1)}" ry="${(62+tunnelPulse*7).toFixed(1)}" fill="url(#wTG)" opacity=".95"/>
+  <rect x="22" y="24" width="656" height="272" rx="18" fill="url(#wA3)"/>
+  <ellipse cx="${cx}" cy="${cy+2}" rx="${(158+speedLevel*18).toFixed(1)}" ry="${(62+tunnelPulse*7).toFixed(1)}" fill="url(#wTG)" opacity=".88"/>
   ${gTrails}${sLines}${vField}${parts}${pTop}${pBot}${wakeCloud}
-  <path d="${profile}" fill="#7dd3fc" opacity=".15" filter="url(#wSG3)"/>
-  <path d="${profile}" fill="url(#wBW)" stroke="url(#wSW)" stroke-width="3.1"/>
-  <line x1="50" y1="68" x2="130" y2="68" stroke="#e2e8f0" stroke-width="3.2" marker-end="url(#fAW)"/>
-  <text x="50" y="50" fill="#e2e8f0" font-size="13">flux d'air</text>
-  <line x1="132" y1="228" x2="${aRX.toFixed(1)}" y2="${aRY.toFixed(1)}" stroke="#facc15" stroke-width="2.8"/>
-  <path d="M 160 228 A 28 28 0 0 0 ${arcEX.toFixed(1)} ${arcEY.toFixed(1)}" fill="none" stroke="#facc15" stroke-width="2.1"/>
-  <text x="94" y="253" fill="#fde68a" font-size="12.5">α = ${aoa.toFixed(1).replace('.0','')}°</text>
-  <rect x="458" y="36" width="196" height="116" rx="16" fill="rgba(15,23,42,.74)" stroke="rgba(255,255,255,.08)"/>
-  <text x="476" y="58" fill="#e2e8f0" font-size="13.5">Lecture aérodynamique</text>
-  <line x1="476" y1="80" x2="510" y2="80" stroke="${topColor}" stroke-width="4"/>
-  <text x="520" y="84" fill="#dbeafe" font-size="12.5">${deepLow?'surpression dessus':isStall?'succion dégradée':'dépression au-dessus'}</text>
-  <line x1="476" y1="106" x2="510" y2="106" stroke="${botColor}" stroke-width="4"/>
-  <text x="520" y="110" fill="#dbeafe" font-size="12.5">${deepLow?'dépression dessous':'pression sous le profil'}</text>
-  <text x="42" y="284" fill="${deepLow?'#fda4af':isStall?'#fdba74':'#a5f3fc'}" font-size="13.5">${stText}</text>`;
+  <path d="${profile}" fill="#e8e8e8" opacity=".10" filter="url(#wSG3)"/>
+  <path d="${profile}" fill="url(#wBW)" stroke="url(#wSW)" stroke-width="2.8"/>
+  <line x1="50" y1="68" x2="130" y2="68" stroke="#e2e8f0" stroke-width="3" marker-end="url(#fAW)"/>
+  <text x="50" y="50" fill="#7a808c" font-size="11" font-family="Space Mono,monospace">flux d'air</text>
+  <line x1="132" y1="228" x2="${aRX.toFixed(1)}" y2="${aRY.toFixed(1)}" stroke="#fbbf24" stroke-width="2.5"/>
+  <path d="M 160 228 A 28 28 0 0 0 ${arcEX.toFixed(1)} ${arcEY.toFixed(1)}" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <text x="94" y="253" fill="#fbbf24" font-size="11.5" font-family="Space Mono,monospace">α = ${aoa.toFixed(1).replace('.0','')}°</text>
+  <rect x="462" y="34" width="196" height="110" rx="10" fill="rgba(12,13,15,.88)" stroke="rgba(255,255,255,.07)"/>
+  <text x="478" y="54" fill="#7a808c" font-size="10" font-family="Space Mono,monospace">LECTURE AÉRO</text>
+  <line x1="478" y1="74" x2="512" y2="74" stroke="${topColor}" stroke-width="3.5"/>
+  <text x="520" y="78" fill="#eceef2" font-size="12" font-family="DM Sans,sans-serif">${deepLow?'surpression dessus':isStall?'succion dégradée':'dépression au-dessus'}</text>
+  <line x1="478" y1="100" x2="512" y2="100" stroke="${botColor}" stroke-width="3.5"/>
+  <text x="520" y="104" fill="#eceef2" font-size="12" font-family="DM Sans,sans-serif">${deepLow?'dépression dessous':'pression sous le profil'}</text>
+  <text x="42" y="308" fill="${deepLow?'#f97316':isStall?'#38bdf8':aoa>stallAngle-2?'#38bdf8':'#eceef2'}" font-size="12" font-family="DM Sans,sans-serif">${stText}</text>`;
 }
-
 let wingStarted=false;
 function startWing(){if(wingStarted)return;wingStarted=true;const l=()=>{drawWing();requestAnimationFrame(l);};l();}
 
-/* ══════════════════════════════════════════
-   7. POMPE CENTRIFUGE — visuel physique rigoureux
-   Lignes de courant spiralées, champ de vitesse,
-   gradient de pression du centre vers la périphérie
-   ══════════════════════════════════════════ */
+/* ══════════════════════════════════
+   TURBOMACHINES (physics unchanged)
+══════════════════════════════════ */
 const g=9.81;
 function bvT(id,fmt){const inp=document.getElementById(id);const out=document.getElementById(id+'Value');const u=()=>{out.innerHTML=fmt(inp.value);};inp.addEventListener('input',u);u();}
 bvT('pumpSpeed',v=>`${v} rpm`);
@@ -634,10 +1097,9 @@ function computePump(){
   const R=+document.getElementById('pumpRadius').value;
   const betaDeg=+document.getElementById('pumpAngle').value;
   const beta=betaDeg*Math.PI/180;
-  const Z=6; // fixe — non affiché
-  const rho=1000;
+  const Z=6;const rho=1000;
   const Q=qh/3600,omega=2*Math.PI*rpm/60,u=omega*R;
-  const b=0.05; // largeur fixe réaliste
+  const b=0.05;
   const Vr=Q/(2*Math.PI*R*b);
   const sigma=clamp(1-Math.PI/Z,.45,.92);
   const Vu2=sigma*(u-Vr/Math.tan(beta));
@@ -645,78 +1107,56 @@ function computePump(){
   const H=(u*Vu2)/g;
   const eta=clamp(.68+.018*Z-.0015*Math.pow(betaDeg-24,2),.55,.86);
   const Pabs=rho*g*Q*Math.max(H,0)/eta;
-  const valid=Vu2>0&&H>0;
-  return{rpm,qh,R,betaDeg,Q,omega,u,Vr,Vu2,V2,H,Pabs,valid};
+  return{rpm,qh,R,betaDeg,Q,omega,u,Vr,Vu2,V2,H,Pabs,valid:Vu2>0&&H>0};
 }
 function computeTurbine(){
   const rpm=+document.getElementById('turbSpeed').value;
   const qh=+document.getElementById('turbFlow').value;
   const R=+document.getElementById('turbRadius').value;
   const betaDeg=+document.getElementById('turbAngle').value;
-  const Z=7;
-  const rho=1000;
+  const Z=7;const rho=1000;
   const Q=qh/3600;
   const omega=2*Math.PI*rpm/60;
-  // Clamp R pour garantir u < 0.9·Vjet ⟹ dVu toujours > 0
   const Cv=0.98,kg=clamp(.72+.022*Z,.78,.96);
-  // Vjet = Cv·√(2g·Hhyd) et Hhyd dépend de u, résoudre u_max iterativement
-  // Approx conservatrice : u_max = 0.85·Cv·√(2g·6) ≈ limite basse, puis on vérifie
-  const Rmax=clamp(R, 0.15, 0.50);
+  const Rmax=clamp(R,0.15,0.50);
   const u=omega*Rmax;
   const eta=clamp(.70+.018*Z-.0010*Math.pow(betaDeg-22,2),.65,.90);
   const Hhyd=clamp((u*u)/(1.55*g)+6,3,300);
-  const Vjet=Cv*Math.sqrt(2*g*Hhyd);
-  // Si u >= Vjet encore, on force Hhyd suffisant
-  const Hhyd2=Math.max(Hhyd, (u/(Cv*0.88))*(u/(Cv*0.88))/(2*g));
+  const Hhyd2=Math.max(Hhyd,(u/(Cv*0.88))*(u/(Cv*0.88))/(2*g));
   const Vjet2=Cv*Math.sqrt(2*g*Hhyd2);
-  const dVu=kg*(Vjet2-u*0.90); // toujours positif
+  const dVu=kg*(Vjet2-u*0.90);
   const Pu=rho*Q*u*dVu;
   const torque=omega>0?Pu/omega:0;
   return{rpm,qh,R:Rmax,betaDeg,Q,omega,u,Vjet:Vjet2,dVu,Pu,torque,eta,Hhyd:Hhyd2,valid:true};
 }
 
-/* Dessin pompe — visuel original hydrolab + trajectoire fluide corrigée */
-function makePumpParticles(t, cx, cy, impellerR, count){
+function makePumpParticles(t,cx,cy,impellerR,count){
   let out='';
-  // Tracer d'abord les lignes de trajet en arrière-plan (statiques)
   const nLines=6;
   for(let i=0;i<nLines;i++){
     const offset=(i/nLines)*Math.PI*2;
-    // phase 1 : ligne droite entrée → centre
-    const x0=36, y0=cy+(i-nLines/2)*14;
-    const xm=cx, ym=cy;
-    out+=`<line x1="${x0}" y1="${y0.toFixed(1)}" x2="${xm}" y2="${ym}" stroke="rgba(55,198,255,0.12)" stroke-width="1.5"/>`;
-    // phase 2 : arc spirale centre → sortie périphérique (demi-spirale visible)
+    const x0=36,y0=cy+(i-nLines/2)*14;
+    out+=`<line x1="${x0}" y1="${y0.toFixed(1)}" x2="${cx}" y2="${cy}" stroke="rgba(232,232,232,0.10)" stroke-width="1.5"/>`;
     let pts='';
     for(let k=0;k<=20;k++){
-      const s=k/20;
-      const a=offset+s*Math.PI*1.6;
-      const r=18+s*(impellerR+85);
-      const px=cx+r*Math.cos(a), py=cy+r*Math.sin(a);
+      const s=k/20,a=offset+s*Math.PI*1.6,r=18+s*(impellerR+85);
+      const px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);
       pts+=(k===0?`M ${px.toFixed(1)} ${py.toFixed(1)}`:`L ${px.toFixed(1)} ${py.toFixed(1)}`);
     }
-    out+=`<path d="${pts}" fill="none" stroke="rgba(55,198,255,0.13)" stroke-width="1.5"/>`;
+    out+=`<path d="${pts}" fill="none" stroke="rgba(232,232,232,0.10)" stroke-width="1.5"/>`;
   }
-  // Particules animées sur ces trajets
   for(let i=0;i<count;i++){
-    const p=(i/count+t*0.08)%1;
-    let x,y,color;
+    const p=(i/count+t*0.08)%1;let x,y,color;
     if(p<0.35){
-      const s=p/0.35;
-      const lane=i%6; const yOff=(lane-2.5)*13;
-      x=36+s*(cx-36); y=cy+yOff*(1-s*0.8);
-      color='#37c6ff';
+      const s=p/0.35,lane=i%6,yOff=(lane-2.5)*13;
+      x=36+s*(cx-36);y=cy+yOff*(1-s*0.8);color='#e8e8e8';
     } else {
-      const s=(p-0.35)/0.65;
-      const offset=(i/count)*Math.PI*2;
-      const a=offset+s*Math.PI*1.6;
-      const r=18+s*(impellerR+85);
-      x=cx+r*Math.cos(a); y=cy+r*Math.sin(a);
-      // couleur : cyan au centre → jaune en périphérie
-      color=s<0.4?'#37c6ff':s<0.7?'#65e7ff':'#ffd166';
+      const s=(p-0.35)/0.65,offset=(i/count)*Math.PI*2,a=offset+s*Math.PI*1.6,r=18+s*(impellerR+85);
+      x=cx+r*Math.cos(a);y=cy+r*Math.sin(a);
+      color=s<0.4?'#e8e8e8':s<0.7?'#5ee8d0':'#e74c3c';
     }
     const sz=2.0+(i%3)*0.4;
-    out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz}" fill="${color}" opacity="0.92"/>`;
+    out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz}" fill="${color}" opacity="0.88"/>`;
   }
   return out;
 }
@@ -727,115 +1167,77 @@ function drawPump(timeMs){
   document.getElementById('pumpP').textContent=`${(d.Pabs/1000).toFixed(2)} kW`;
   document.getElementById('pumpU').textContent=`${d.u.toFixed(1)} m/s`;
   document.getElementById('pumpV2').textContent=`${d.V2.toFixed(2)} m/s`;
-
   const svg=document.getElementById('pumpSvg');
   const cx=310,cy=170,phase=timeMs*0.00155*(d.rpm/1100);
   const iR=40,oR=clamp(80+d.R*130,95,200);
-  const Z=6;
-  const casingR=oR+28;
-  const hubR=iR*0.28;
-
+  const Z=6,casingR=oR+28,hubR=iR*0.28;
   let blades='';
   for(let i=0;i<Z;i++){
     const a=phase+(i/Z)*Math.PI*2,lean=d.betaDeg*Math.PI/180;
     const x1=cx+(hubR+10)*Math.cos(a),y1=cy+(hubR+10)*Math.sin(a);
     const x2=cx+oR*Math.cos(a+lean*.6),y2=cy+oR*Math.sin(a+lean*.6);
-    blades+=`<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${(cx+(hubR+oR)*.5*Math.cos(a+lean*.3)).toFixed(1)} ${(cy+(hubR+oR)*.5*Math.sin(a+lean*.3)).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="rgba(55,198,255,0.25)" stroke="#5de6ff" stroke-width="2.1"/>`;
+    blades+=`<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${(cx+(hubR+oR)*.5*Math.cos(a+lean*.3)).toFixed(1)} ${(cy+(hubR+oR)*.5*Math.sin(a+lean*.3)).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="rgba(232,232,232,0.18)" stroke="#e8e8e8" stroke-width="2"/>`;
   }
-
   const flowParticles=makePumpParticles(timeMs*0.001,cx,cy,oR,48);
   const aspX=cx-oR-60,refX=cx+oR+10,refY=cy-oR*.5;
-
-  let boxLines=[
-    `σ = ${(1-Math.PI/Z).toFixed(3)}`,
-    `V_u2 = ${d.Vu2.toFixed(2)} m/s`,
-    `P = ${(d.Pabs/1000).toFixed(2)} kW`,
-    `C = ${(d.Pabs/Math.max(d.omega,0.1)).toFixed(2)} N·m`
-  ];
-
-  svg.innerHTML=`
-  <defs>
-    <radialGradient id="pAura" cx="50%" cy="48%" r="64%">
-      <stop offset="0%" stop-color="rgba(55,198,255,0.16)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-    </radialGradient>
-    <linearGradient id="pMetal" x1="0" x2="1">
-      <stop offset="0%" stop-color="#c2cfdf"/>
-      <stop offset="50%" stop-color="#f7fbff"/>
-      <stop offset="100%" stop-color="#93a7be"/>
-    </linearGradient>
-    <linearGradient id="pPipe" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#37c6ff" stop-opacity=".35"/>
-      <stop offset="100%" stop-color="#1d4ed8" stop-opacity=".20"/>
-    </linearGradient>
+  const boxLines=[`σ = ${(1-Math.PI/Z).toFixed(3)}`,`V_u2 = ${d.Vu2.toFixed(2)} m/s`,`P = ${(d.Pabs/1000).toFixed(2)} kW`,`C = ${(d.Pabs/Math.max(d.omega,0.1)).toFixed(2)} N·m`];
+  svg.innerHTML=`<defs>
+    <radialGradient id="pAura" cx="50%" cy="48%" r="64%"><stop offset="0%" stop-color="rgba(232,232,232,0.14)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/></radialGradient>
+    <linearGradient id="pMetal" x1="0" x2="1"><stop offset="0%" stop-color="#c2cfdf"/><stop offset="50%" stop-color="#f0f4f8"/><stop offset="100%" stop-color="#8fa3b8"/></linearGradient>
+    <linearGradient id="pPipe" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#e8e8e8" stop-opacity=".30"/><stop offset="100%" stop-color="#bdc3c7" stop-opacity=".18"/></linearGradient>
     <filter id="pGlow"><feGaussianBlur stdDeviation="10" result="blur"/></filter>
-    <marker id="pArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#37c6ff"/>
-    </marker>
+    <marker id="pArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8e8e8"/></marker>
   </defs>
-  <rect x="20" y="20" width="660" height="300" rx="22" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.05)"/>
-  <rect x="36" y="36" width="628" height="268" rx="18" fill="url(#pAura)"/>
-  <circle cx="${cx}" cy="${cy}" r="${(casingR+14).toFixed(1)}" fill="#37c6ff" opacity="0.10" filter="url(#pGlow)"/>
-  <circle cx="${cx}" cy="${cy}" r="${casingR.toFixed(1)}" fill="rgba(255,255,255,.02)" stroke="url(#pMetal)" stroke-width="11"/>
-  <circle cx="${cx}" cy="${cy}" r="${(oR+14).toFixed(1)}" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
-  <rect x="${(cx-220).toFixed(1)}" y="${(cy-8).toFixed(1)}" width="440" height="16" rx="8" fill="url(#pMetal)" opacity=".92"/>
+  ${svgBg(700,340)}
+  <rect x="36" y="36" width="628" height="268" rx="16" fill="url(#pAura)"/>
+  <circle cx="${cx}" cy="${cy}" r="${(casingR+14).toFixed(1)}" fill="#e8e8e8" opacity="0.08" filter="url(#pGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="${casingR.toFixed(1)}" fill="rgba(255,255,255,.02)" stroke="url(#pMetal)" stroke-width="10"/>
+  <circle cx="${cx}" cy="${cy}" r="${(oR+14).toFixed(1)}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.07)" stroke-width="1.5"/>
+  <rect x="${(cx-220).toFixed(1)}" y="${(cy-8).toFixed(1)}" width="440" height="16" rx="8" fill="url(#pMetal)" opacity=".88"/>
   ${blades}
-  <circle cx="${cx}" cy="${cy}" r="${hubR.toFixed(1)}" fill="url(#pMetal)" stroke="rgba(255,255,255,.18)" stroke-width="3"/>
-  <circle cx="${cx}" cy="${cy}" r="8" fill="#0a1424" stroke="#f4fbff" stroke-width="2"/>
+  <circle cx="${cx}" cy="${cy}" r="${hubR.toFixed(1)}" fill="url(#pMetal)" stroke="rgba(255,255,255,.15)" stroke-width="2.5"/>
+  <circle cx="${cx}" cy="${cy}" r="8" fill="#0c0d0f" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
   ${flowParticles}
-  <rect x="${aspX}" y="${cy-12}" width="${oR+60}" height="24" rx="8" fill="url(#pPipe)" stroke="rgba(55,198,255,.30)" stroke-width="1.5"/>
-  <line x1="${aspX+8}" y1="${cy}" x2="${aspX+oR+45}" y2="${cy}" stroke="#37c6ff" stroke-width="2.5" marker-end="url(#pArrow)" stroke-dasharray="6 4"/>
-  <text x="${aspX}" y="${cy-18}" fill="#9be8ff" font-size="12" font-weight="600">Aspiration</text>
-  <rect x="${refX}" y="${refY-12}" width="70" height="24" rx="8" fill="url(#pPipe)" stroke="rgba(250,204,21,.35)" stroke-width="1.5"/>
-  <line x1="${refX+8}" y1="${refY}" x2="${refX+60}" y2="${refY}" stroke="#facc15" stroke-width="2.5" marker-end="url(#pArrow)"/>
-  <text x="${refX}" y="${refY-18}" fill="#fde68a" font-size="12" font-weight="600">Refoulement</text>
-  <rect x="530" y="210" width="148" height="88" rx="14" fill="rgba(7,16,28,.85)" stroke="rgba(255,255,255,.07)"/>
-  <text x="546" y="230" fill="#eaf6ff" font-size="12">${boxLines[0]}</text>
-  <text x="546" y="250" fill="#65e7ff" font-size="12">${boxLines[1]}</text>
-  <text x="546" y="270" fill="#eaf6ff" font-size="12">${boxLines[2]}</text>
-  <text x="546" y="290" fill="#65e7ff" font-size="12">${boxLines[3]}</text>`;
+  <rect x="${aspX}" y="${cy-12}" width="${oR+60}" height="24" rx="7" fill="url(#pPipe)" stroke="rgba(232,232,232,.25)" stroke-width="1.5"/>
+  <line x1="${aspX+8}" y1="${cy}" x2="${aspX+oR+45}" y2="${cy}" stroke="#e8e8e8" stroke-width="2.5" marker-end="url(#pArrow)" stroke-dasharray="6 4"/>
+  <text x="${aspX-40}" y="${cy-18}" fill="#e8e8e8" font-size="11" font-family="Space Mono,monospace">Aspiration</text>
+  <rect x="${refX}" y="${refY-12}" width="70" height="24" rx="7" fill="rgba(231,76,60,.15)" stroke="rgba(231,76,60,.30)" stroke-width="1.5"/>
+  <line x1="${refX+8}" y1="${refY}" x2="${refX+60}" y2="${refY}" stroke="#e74c3c" stroke-width="2.5" marker-end="url(#pArrow)"/>
+  <text x="${refX}" y="${refY-18}" fill="#e74c3c" font-size="11" font-family="Space Mono,monospace">Refoulement</text>
+  <rect x="530" y="210" width="148" height="90" rx="10" fill="rgba(12,13,15,.92)" stroke="rgba(255,255,255,.07)"/>
+  <text x="546" y="229" fill="#7a808c" font-size="10" font-family="Space Mono,monospace">${boxLines[0]}</text>
+  <text x="546" y="249" fill="#e8e8e8" font-size="11" font-family="Space Mono,monospace">${boxLines[1]}</text>
+  <text x="546" y="269" fill="#eceef2" font-size="11" font-family="Space Mono,monospace">${boxLines[2]}</text>
+  <text x="546" y="289" fill="#e74c3c" font-size="11" font-family="Space Mono,monospace">${boxLines[3]}</text>`;
 }
 
-/* Dessin turbine — visuel original hydrolab + trajectoire fluide corrigée */
-function makeTurbineParticles(t, cx, cy, impellerR, count){
+function makeTurbineParticles(t,cx,cy,impellerR,count){
   let out='';
-  // Lignes de trajet statiques : spirale convergente périphérie → centre puis sortie droite
   const nLines=6;
   for(let i=0;i<nLines;i++){
     const offset=(i/nLines)*Math.PI*2;
     let pts='';
     for(let k=0;k<=20;k++){
-      const s=k/20;
-      const a=offset-s*Math.PI*1.6; // convergent = sens inverse pompe
-      const r=(impellerR+90)-s*(impellerR+72);
-      const px=cx+r*Math.cos(a), py=cy+r*Math.sin(a);
+      const s=k/20,a=offset-s*Math.PI*1.6,r=(impellerR+90)-s*(impellerR+72);
+      const px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);
       pts+=(k===0?`M ${px.toFixed(1)} ${py.toFixed(1)}`:`L ${px.toFixed(1)} ${py.toFixed(1)}`);
     }
-    out+=`<path d="${pts}" fill="none" stroke="rgba(54,212,142,0.13)" stroke-width="1.5"/>`;
-    // sortie droite depuis le centre
-    const xExit=cx+impellerR+30+((i/nLines)*20-10);
-    out+=`<line x1="${cx}" y1="${(cy+(i-2.5)*13).toFixed(1)}" x2="${cx+impellerR+200}" y2="${(cy+(i-2.5)*13).toFixed(1)}" stroke="rgba(54,212,142,0.12)" stroke-width="1.5"/>`;
+    out+=`<path d="${pts}" fill="none" stroke="rgba(231,76,60,0.10)" stroke-width="1.5"/>`;
+    const xExit=cx+impellerR+30;
+    out+=`<line x1="${cx}" y1="${(cy+(i-2.5)*13).toFixed(1)}" x2="${cx+impellerR+200}" y2="${(cy+(i-2.5)*13).toFixed(1)}" stroke="rgba(231,76,60,0.10)" stroke-width="1.5"/>`;
   }
-  // Particules animées
   for(let i=0;i<count;i++){
-    const p=(i/count+t*0.08)%1;
-    let x,y,color;
+    const p=(i/count+t*0.08)%1;let x,y,color;
     if(p<0.58){
-      const s=p/0.58;
-      const offset=(i/count)*Math.PI*2;
-      const a=offset-s*Math.PI*1.6;
-      const r=(impellerR+90)-s*(impellerR+72);
-      x=cx+r*Math.cos(a); y=cy+r*Math.sin(a);
-      // couleur : vert clair (entrée) → cyan (sortie roue)
-      color=s<0.4?'#9effc9':s<0.7?'#36d48e':'#65e7ff';
+      const s=p/0.58,offset=(i/count)*Math.PI*2,a=offset-s*Math.PI*1.6,r=(impellerR+90)-s*(impellerR+72);
+      x=cx+r*Math.cos(a);y=cy+r*Math.sin(a);
+      color=s<0.4?'#e74c3c':s<0.7?'#f1948a':'#e8e8e8';
     } else {
-      const s=(p-0.58)/0.42;
-      const lane=i%6; const yOff=(lane-2.5)*13;
-      x=cx+impellerR+30+s*170; y=cy+yOff;
-      color='#65e7ff';
+      const s=(p-0.58)/0.42,lane=i%6,yOff=(lane-2.5)*13;
+      x=cx+impellerR+30+s*170;y=cy+yOff;color='#e8e8e8';
     }
     const sz=2.0+(i%3)*0.4;
-    out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz}" fill="${color}" opacity="0.92"/>`;
+    out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz}" fill="${color}" opacity="0.88"/>`;
   }
   return out;
 }
@@ -846,73 +1248,50 @@ function drawTurbine(timeMs){
   document.getElementById('turbPu').textContent=`${(d.Pu/1000).toFixed(2)} kW`;
   document.getElementById('turbC').textContent=`${d.torque.toFixed(1)} N·m`;
   document.getElementById('turbEta').textContent=`${(d.eta*100).toFixed(1)} %`;
-
   const svg=document.getElementById('turbSvg');
   const cx=310,cy=170,phase=timeMs*0.00155*(-1)*(d.rpm/900);
   const iR=35,oR=clamp(75+d.R*120,90,195);
-  const Z=7;
-  const casingR=oR+24;
-  const hubR=iR*0.28;
-
+  const Z=7,casingR=oR+24,hubR=iR*0.28;
   let blades='';
   for(let i=0;i<Z;i++){
     const a=phase+(i/Z)*Math.PI*2,lean=-(d.betaDeg)*Math.PI/180;
     const x1=cx+(hubR+10)*Math.cos(a),y1=cy+(hubR+10)*Math.sin(a);
     const x2=cx+oR*Math.cos(a+lean*.5),y2=cy+oR*Math.sin(a+lean*.5);
-    blades+=`<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${(cx+(hubR+oR)*.5*Math.cos(a+lean*.25)).toFixed(1)} ${(cy+(hubR+oR)*.5*Math.sin(a+lean*.25)).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="rgba(54,212,142,0.24)" stroke="#57efab" stroke-width="2.1"/>`;
+    blades+=`<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${(cx+(hubR+oR)*.5*Math.cos(a+lean*.25)).toFixed(1)} ${(cy+(hubR+oR)*.5*Math.sin(a+lean*.25)).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="rgba(231,76,60,0.18)" stroke="#e74c3c" stroke-width="2"/>`;
   }
-
   const flowParticles=makeTurbineParticles(timeMs*0.001,cx,cy,oR,48);
   const entX=cx-oR-62,entY=cy-oR*.35;
-
-  let boxLines=[
-    `V_jet = ${d.Vjet.toFixed(2)} m/s`,
-    `ΔV_u = ${d.dVu.toFixed(2)} m/s`,
-    `P_u = ${(d.Pu/1000).toFixed(2)} kW`,
-    `C = ${d.torque.toFixed(2)} N·m`
-  ];
-
-  svg.innerHTML=`
-  <defs>
-    <radialGradient id="tAura" cx="50%" cy="48%" r="64%">
-      <stop offset="0%" stop-color="rgba(54,212,142,0.14)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-    </radialGradient>
-    <linearGradient id="tMetal" x1="0" x2="1">
-      <stop offset="0%" stop-color="#c2cfdf"/>
-      <stop offset="50%" stop-color="#f7fbff"/>
-      <stop offset="100%" stop-color="#93a7be"/>
-    </linearGradient>
-    <linearGradient id="tPipe" x1="0" x2="1">
-      <stop offset="0%" stop-color="#36d48e" stop-opacity=".35"/>
-      <stop offset="100%" stop-color="#22d3ee" stop-opacity=".15"/>
-    </linearGradient>
+  const boxLines=[`V_jet = ${d.Vjet.toFixed(2)} m/s`,`ΔV_u = ${d.dVu.toFixed(2)} m/s`,`P_u = ${(d.Pu/1000).toFixed(2)} kW`,`C = ${d.torque.toFixed(2)} N·m`];
+  svg.innerHTML=`<defs>
+    <radialGradient id="tAura" cx="50%" cy="48%" r="64%"><stop offset="0%" stop-color="rgba(231,76,60,0.12)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/></radialGradient>
+    <linearGradient id="tMetal" x1="0" x2="1"><stop offset="0%" stop-color="#c2cfdf"/><stop offset="50%" stop-color="#f0f4f8"/><stop offset="100%" stop-color="#8fa3b8"/></linearGradient>
+    <linearGradient id="tPipe" x1="0" x2="1"><stop offset="0%" stop-color="#e74c3c" stop-opacity=".30"/><stop offset="100%" stop-color="#e8e8e8" stop-opacity=".15"/></linearGradient>
     <filter id="tGlow"><feGaussianBlur stdDeviation="11" result="blur"/></filter>
-    <marker id="tArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#36d48e"/>
-    </marker>
+    <marker id="tArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e74c3c"/></marker>
   </defs>
-  <rect x="20" y="20" width="660" height="300" rx="22" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.05)"/>
-  <rect x="36" y="36" width="628" height="268" rx="18" fill="url(#tAura)"/>
-  <circle cx="${cx}" cy="${cy}" r="${(casingR+14).toFixed(1)}" fill="#36d48e" opacity="0.10" filter="url(#tGlow)"/>
-  <circle cx="${cx}" cy="${cy}" r="${casingR.toFixed(1)}" fill="rgba(255,255,255,.02)" stroke="url(#tMetal)" stroke-width="11"/>
-  <circle cx="${cx}" cy="${cy}" r="${(oR+14).toFixed(1)}" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
-  <rect x="${(cx-220).toFixed(1)}" y="${(cy-8).toFixed(1)}" width="440" height="16" rx="8" fill="url(#tMetal)" opacity=".92"/>
+  ${svgBg(700,340)}
+  <rect x="36" y="36" width="628" height="268" rx="16" fill="url(#tAura)"/>
+  <circle cx="${cx}" cy="${cy}" r="${(casingR+14).toFixed(1)}" fill="#e74c3c" opacity="0.08" filter="url(#tGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="${casingR.toFixed(1)}" fill="rgba(255,255,255,.02)" stroke="url(#tMetal)" stroke-width="10"/>
+  <circle cx="${cx}" cy="${cy}" r="${(oR+14).toFixed(1)}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.07)" stroke-width="1.5"/>
+  <rect x="${(cx-220).toFixed(1)}" y="${(cy-8).toFixed(1)}" width="440" height="16" rx="8" fill="url(#tMetal)" opacity=".88"/>
   ${blades}
-  <circle cx="${cx}" cy="${cy}" r="${hubR.toFixed(1)}" fill="url(#tMetal)" stroke="rgba(255,255,255,.18)" stroke-width="3"/>
-  <circle cx="${cx}" cy="${cy}" r="8" fill="#0a1424" stroke="#f4fbff" stroke-width="2"/>
+  <circle cx="${cx}" cy="${cy}" r="${hubR.toFixed(1)}" fill="url(#tMetal)" stroke="rgba(255,255,255,.15)" stroke-width="2.5"/>
+  <circle cx="${cx}" cy="${cy}" r="8" fill="#0c0d0f" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
   ${flowParticles}
-  <rect x="${entX}" y="${entY-12}" width="${oR+62}" height="24" rx="8" fill="url(#tPipe)" stroke="rgba(54,212,142,.32)" stroke-width="1.5"/>
-  <line x1="${entX+8}" y1="${entY}" x2="${entX+oR+52}" y2="${entY}" stroke="#36d48e" stroke-width="2.5" marker-end="url(#tArrow)" stroke-dasharray="6 4"/>
-  <text x="${entX}" y="${entY-18}" fill="#9fffce" font-size="12" font-weight="600">Entrée</text>
-  <rect x="530" y="210" width="148" height="88" rx="14" fill="rgba(7,16,28,.85)" stroke="rgba(255,255,255,.07)"/>
-  <text x="546" y="230" fill="#eaf6ff" font-size="12">${boxLines[0]}</text>
-  <text x="546" y="250" fill="#9fffce" font-size="12">${boxLines[1]}</text>
-  <text x="546" y="270" fill="#eaf6ff" font-size="12">${boxLines[2]}</text>
-  <text x="546" y="290" fill="#9fffce" font-size="12">${boxLines[3]}</text>`;
+  <rect x="${entX}" y="${entY-12}" width="${oR+62}" height="24" rx="7" fill="url(#tPipe)" stroke="rgba(231,76,60,.28)" stroke-width="1.5"/>
+  <line x1="${entX+8}" y1="${entY}" x2="${entX+oR+52}" y2="${entY}" stroke="#e74c3c" stroke-width="2.5" marker-end="url(#tArrow)" stroke-dasharray="6 4"/>
+  <text x="${entX}" y="${entY-18}" fill="#e74c3c" font-size="11" font-family="Space Mono,monospace">Entrée</text>
+  <rect x="530" y="210" width="148" height="90" rx="10" fill="rgba(12,13,15,.92)" stroke="rgba(255,255,255,.07)"/>
+  <text x="546" y="229" fill="#7a808c" font-size="10" font-family="Space Mono,monospace">${boxLines[0]}</text>
+  <text x="546" y="249" fill="#e74c3c" font-size="11" font-family="Space Mono,monospace">${boxLines[1]}</text>
+  <text x="546" y="269" fill="#eceef2" font-size="11" font-family="Space Mono,monospace">${boxLines[2]}</text>
+  <text x="546" y="289" fill="#e8e8e8" font-size="11" font-family="Space Mono,monospace">${boxLines[3]}</text>`;
 }
 
-/* ── WIRING ── */
+/* ══════════════════════════════════
+   WIRING + INIT
+══════════════════════════════════ */
 function fullUpdate(){drawTraction();drawBeam();drawCFD();}
 ['tractionForce','tractionPoisson','tractionThickness','tractionStiffness',
  'beamLoad','beamSpan','beamHeight','beamYoung',
@@ -921,22 +1300,13 @@ function fullUpdate(){drawTraction();drawBeam();drawCFD();}
  'rollSpeed','rollOmega','rollRadius','rollFriction',
  'wingSpeed','wingAoA','wingCamber','wingArea'
 ].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',fullUpdate);});
-
-['pumpSpeed','pumpFlow','pumpRadius','pumpAngle'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el)el.addEventListener('input',()=>drawPump(performance.now()));
-});
-['turbSpeed','turbFlow','turbRadius','turbAngle'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el)el.addEventListener('input',()=>drawTurbine(performance.now()));
-});
+['pumpSpeed','pumpFlow','pumpRadius','pumpAngle'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>drawPump(performance.now()));});
+['turbSpeed','turbFlow','turbRadius','turbAngle'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>drawTurbine(performance.now()));});
 
 fullUpdate();
 drawGears();
 drawRolling();
 startWing();
-
-// Boucles d'animation pompe et turbine indépendantes
 function pumpLoop(t){drawPump(t);requestAnimationFrame(pumpLoop);}
 function turbineLoop(t){drawTurbine(t);requestAnimationFrame(turbineLoop);}
 requestAnimationFrame(pumpLoop);
