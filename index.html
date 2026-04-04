@@ -8,12 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <style>
-    /* ═══════════════════════════════════════
-       DESIGN SYSTEM — LUXURY ENGINEERING LAB
-       Palette: Near-black + warm gold + electric teal
-       Typography: DM Serif Display / DM Sans / Space Mono
-       Aesthetic: Swiss precision meets atelier darkness
-    ═══════════════════════════════════════ */
     :root {
       --ink:      #0c0d0f;
       --paper:    #111316;
@@ -36,7 +30,6 @@
     }
     *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
-
     body {
       margin: 0;
       font-family: 'DM Sans', sans-serif;
@@ -45,371 +38,104 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
-    /* Subtle noise texture overlay */
     body::before {
       content: '';
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
       opacity: 0.5;
     }
-
     .page { position: relative; z-index: 1; }
-
-    /* ── HEADER ── */
     header {
-      max-width: 1320px;
-      margin: 0 auto;
+      max-width: 1320px; margin: 0 auto;
       padding: 72px 32px 48px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: end;
-      gap: 32px;
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: end; gap: 32px;
       border-bottom: 1px solid var(--border);
     }
-    .header-left {}
     .eyebrow {
       display: inline-flex; align-items: center; gap: 10px;
       font-family: 'Space Mono', monospace;
       font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
       color: var(--gold); margin-bottom: 20px;
     }
-    .eyebrow::before {
-      content: '';
-      display: block; width: 28px; height: 1px; background: var(--gold);
-    }
+    .eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gold); }
     header h1 {
-      margin: 0;
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(2.4rem, 5vw, 5rem);
-      font-weight: 400;
-      line-height: 1.0;
-      letter-spacing: -0.02em;
-      color: var(--text);
+      margin: 0; font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5vw, 5rem); font-weight: 400;
+      line-height: 1.0; letter-spacing: -0.02em; color: var(--text);
     }
-    header h1 em {
-      font-style: italic;
-      color: var(--gold-l);
-    }
-    .header-sub {
-      margin: 16px 0 0;
-      font-size: 1rem;
-      color: var(--muted);
-      line-height: 1.6;
-      font-weight: 300;
-      max-width: 520px;
-    }
+    header h1 em { font-style: italic; color: var(--gold-l); }
+    .header-sub { margin: 16px 0 0; font-size: 1rem; color: var(--muted); line-height: 1.6; font-weight: 300; max-width: 520px; }
     .header-right { text-align: right; padding-bottom: 6px; }
-    .version-badge {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem; color: var(--muted);
-      letter-spacing: 0.06em;
-      line-height: 2;
-    }
+    .version-badge { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; line-height: 2; }
     .version-badge strong { color: var(--teal); display: block; font-size: 1.1rem; }
-
-    /* ── LEGEND BAR ── */
     .legend-strip {
-      max-width: 1320px; margin: 0 auto;
-      padding: 20px 32px;
+      max-width: 1320px; margin: 0 auto; padding: 20px 32px;
       display: flex; align-items: center; gap: 20px;
       border-bottom: 1px solid var(--border);
     }
-    .legend-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--muted); white-space: nowrap;
-    }
-    .legend-bar {
-      flex: 1; height: 6px; border-radius: 999px;
-      background: linear-gradient(90deg,#1d4ed8,#22d3ee,#facc15,#f97316,#dc2626);
-    }
-    .legend-ticks {
-      display: flex; justify-content: space-between;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem; color: var(--faint);
-      width: 100%; margin-top: 4px;
-    }
-
-    /* ── CONTAINER ── */
-    .container {
-      max-width: 1320px; margin: 0 auto;
-      padding: 40px 32px 80px;
-      display: grid; gap: 28px;
-    }
-
-    /* ── GRID ── */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 20px;
-    }
-
-    /* ── CARD ── */
-    .card {
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      border-radius: var(--r-lg);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
-    }
-    .card:hover {
-      border-color: var(--border-h);
-      box-shadow: 0 0 0 1px rgba(231,76,60,0.08), 0 32px 64px rgba(0,0,0,0.5);
-    }
-
-    /* Card accent bar at top */
-    .card::before {
-      content: '';
-      display: block; height: 2px;
-      background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
-      opacity: 0.6;
-    }
-
+    .legend-label { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .legend-bar { flex: 1; height: 6px; border-radius: 999px; background: linear-gradient(90deg,#1d4ed8,#22d3ee,#facc15,#f97316,#dc2626); }
+    .legend-ticks { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--faint); width: 100%; margin-top: 4px; }
+    .container { max-width: 1320px; margin: 0 auto; padding: 40px 32px 80px; display: grid; gap: 28px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }
+    .card { display: grid; grid-template-rows: auto auto 1fr; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+    .card:hover { border-color: var(--border-h); box-shadow: 0 0 0 1px rgba(231,76,60,0.08), 0 32px 64px rgba(0,0,0,0.5); }
+    .card::before { content: ''; display: block; height: 2px; background: linear-gradient(90deg, var(--gold) 0%, transparent 60%); opacity: 0.6; }
     .card-header { padding: 24px 24px 0; }
-    .card-num {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 10px;
-    }
-    .card-header h2 {
-      margin: 0 0 10px;
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.28rem; font-weight: 400;
-      line-height: 1.25; letter-spacing: -0.01em;
-    }
-    .card-header p {
-      margin: 0;
-      font-size: 0.88rem; color: var(--muted);
-      line-height: 1.65; font-weight: 300;
-    }
-
-    /* ── CONTROLS ── */
-    .controls {
-      margin: 20px 24px 0;
-      padding: 16px;
-      border-radius: var(--r);
-      background: var(--raised);
-      border: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 20px;
-    }
+    .card-num { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .card-header h2 { margin: 0 0 10px; font-family: 'DM Serif Display', serif; font-size: 1.28rem; font-weight: 400; line-height: 1.25; letter-spacing: -0.01em; }
+    .card-header p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.65; font-weight: 300; }
+    .controls { margin: 20px 24px 0; padding: 16px; border-radius: var(--r); background: var(--raised); border: 1px solid var(--border); display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 20px; }
     .control { display: flex; flex-direction: column; gap: 7px; }
-    .control label {
-      display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase;
-      color: var(--muted);
-    }
-    .control label span {
-      color: var(--teal); font-weight: 700; white-space: nowrap;
-      font-size: 0.78rem;
-    }
-    input[type="range"] {
-      width: 100%; cursor: pointer;
-      -webkit-appearance: none; appearance: none;
-      height: 3px; border-radius: 999px;
-      background: var(--faint);
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: var(--gold);
-      border: 2px solid var(--ink);
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.25);
-      box-shadow: 0 0 0 4px rgba(231,76,60,0.18);
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 14px; height: 14px; border-radius: 50%;
-      background: var(--gold); border: 2px solid var(--ink); cursor: pointer;
-    }
-
-    /* ── STAGE ── */
-    .stage {
-      margin: 20px 24px 24px;
-      display: flex; flex-direction: column; gap: 14px;
-    }
-    .stage svg, .stage canvas {
-      width: 100%; height: 340px; display: block;
-      border-radius: var(--r);
-      background: var(--ink);
-      border: 1px solid var(--border);
-    }
-
-    /* ── METRICS ── */
+    .control label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    .control label span { color: var(--teal); font-weight: 700; white-space: nowrap; font-size: 0.78rem; }
+    input[type="range"] { width: 100%; cursor: pointer; -webkit-appearance: none; appearance: none; height: 3px; border-radius: 999px; background: var(--faint); outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); border: 2px solid var(--ink); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.25); box-shadow: 0 0 0 4px rgba(231,76,60,0.18); }
+    input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--gold); border: 2px solid var(--ink); cursor: pointer; }
+    .stage { margin: 20px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+    .stage svg, .stage canvas { width: 100%; height: 340px; display: block; border-radius: var(--r); background: var(--ink); border: 1px solid var(--border); }
     .metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-    .metric {
-      padding: 12px 14px;
-      border-radius: var(--r-sm);
-      background: var(--raised);
-      border: 1px solid var(--border);
-    }
-    .metric span {
-      display: block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.60rem; letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 5px;
-    }
-    .metric strong {
-      display: block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.88rem; color: var(--text);
-      word-break: break-word; line-height: 1.3;
-    }
-
-    /* ── WING CARD (gradient accent) ── */
+    .metric { padding: 12px 14px; border-radius: var(--r-sm); background: var(--raised); border: 1px solid var(--border); }
+    .metric span { display: block; font-family: 'Space Mono', monospace; font-size: 0.60rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .metric strong { display: block; font-family: 'Space Mono', monospace; font-size: 0.88rem; color: var(--text); word-break: break-word; line-height: 1.3; }
     .wing-card { position: relative; }
-
-    /* ── TURBO CARDS ── */
-    .turbo-card {
-      border-radius: var(--r-lg);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
-    }
-    .turbo-card:hover {
-      border-color: var(--border-h);
-      box-shadow: 0 0 0 1px rgba(231,76,60,0.08), 0 32px 64px rgba(0,0,0,0.5);
-    }
-    .turbo-card::before {
-      content: '';
-      display: block; height: 2px;
-      background: linear-gradient(90deg, var(--teal) 0%, var(--gold) 50%, transparent 80%);
-      opacity: 0.5;
-    }
+    .turbo-card { border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+    .turbo-card:hover { border-color: var(--border-h); box-shadow: 0 0 0 1px rgba(231,76,60,0.08), 0 32px 64px rgba(0,0,0,0.5); }
+    .turbo-card::before { content: ''; display: block; height: 2px; background: linear-gradient(90deg, var(--teal) 0%, var(--gold) 50%, transparent 80%); opacity: 0.5; }
     .turbo-header { padding: 24px 28px 0; }
     .turbo-header .card-num { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-    .turbo-header h2 {
-      margin: 0 0 8px;
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem; font-weight: 400;
-      letter-spacing: -0.01em;
-    }
+    .turbo-header h2 { margin: 0 0 8px; font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 400; letter-spacing: -0.01em; }
     .turbo-header p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.65; font-weight: 300; max-width: 700px; }
-    .turbo-body {
-      display: flex;
-      flex-direction: column;
-    }
-    .turbo-panel {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 10px;
-    }
+    .turbo-body { display: flex; flex-direction: column; }
+    .turbo-panel { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
     .turbo-controls { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px 18px; }
     .turbo-control { display: flex; flex-direction: column; gap: 6px; }
-    .turbo-control label {
-      display: flex; justify-content: space-between;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.04em; text-transform: uppercase;
-      color: var(--muted);
-    }
+    .turbo-control label { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
     .turbo-control label span { color: var(--teal); font-weight: 700; font-size: 0.74rem; }
     .turbo-stage { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 12px; }
-    .turbo-stage svg {
-      width: 100%; height: 320px; display: block;
-      border-radius: var(--r);
-      background: var(--ink);
-      border: 1px solid var(--border);
-    }
+    .turbo-stage svg { width: 100%; height: 320px; display: block; border-radius: var(--r); background: var(--ink); border: 1px solid var(--border); }
     .turbo-metrics { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
-    .turbo-metric {
-      padding: 11px 13px;
-      border-radius: var(--r-sm);
-      background: var(--raised);
-      border: 1px solid var(--border);
-    }
-    .turbo-metric span {
-      display: block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.05em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 4px;
-    }
-    .turbo-metric strong {
-      display: block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.84rem; color: var(--text); word-break: break-word; line-height: 1.3;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      max-width: 1320px; margin: 0 auto;
-      padding: 28px 32px 64px;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 16px; flex-wrap: wrap;
-    }
-    .footer-name {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.1rem; color: var(--text); font-weight: 400;
-    }
-    .footer-meta {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.66rem; color: var(--muted); letter-spacing: 0.06em;
-      text-align: right; line-height: 1.8;
-    }
-
-    /* ── SECTION TITLE ── */
-    .section-title {
-      display: flex; align-items: center; gap: 16px;
-      padding: 0 0 4px;
-    }
-    .section-title h3 {
-      margin: 0;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); font-weight: 400;
-    }
-    .section-title::after {
-      content: '';
-      flex: 1; height: 1px; background: var(--border);
-    }
-
-    /* ── SCROLL REVEAL ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.55s ease, transform 0.55s ease;
-    }
+    .turbo-metric { padding: 11px 13px; border-radius: var(--r-sm); background: var(--raised); border: 1px solid var(--border); }
+    .turbo-metric span { display: block; font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .turbo-metric strong { display: block; font-family: 'Space Mono', monospace; font-size: 0.84rem; color: var(--text); word-break: break-word; line-height: 1.3; }
+    footer { max-width: 1320px; margin: 0 auto; padding: 28px 32px 64px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .footer-name { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--text); font-weight: 400; }
+    .footer-meta { font-family: 'Space Mono', monospace; font-size: 0.66rem; color: var(--muted); letter-spacing: 0.06em; text-align: right; line-height: 1.8; }
+    .section-title { display: flex; align-items: center; gap: 16px; padding: 0 0 4px; }
+    .section-title h3 { margin: 0; font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.55s ease, transform 0.55s ease; }
     .reveal.visible { opacity: 1; transform: none; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .grid { grid-template-columns: 1fr; }
-      .turbo-body { grid-template-columns: 1fr; }
-      .turbo-panel { border-right: none; border-bottom: 1px solid var(--border); }
-      .turbo-metrics { grid-template-columns: repeat(2,1fr); }
-    }
-    @media (max-width: 768px) {
-      header { grid-template-columns: 1fr; padding: 48px 20px 32px; }
-      .header-right { text-align: left; }
-      .container { padding: 24px 16px 48px; }
-      .controls { grid-template-columns: 1fr; }
-      .stage svg, .stage canvas { height: 270px; }
-      .turbo-stage svg { height: 250px; }
-      .metrics { grid-template-columns: 1fr; }
-      .legend-strip { padding: 16px 20px; flex-wrap: wrap; }
-    }
-    @media (max-width: 480px) {
-      header h1 { font-size: 2rem; }
-      .card-header { padding: 18px 16px 0; }
-      .controls { margin: 16px 16px 0; }
-      .stage { margin: 16px 16px 16px; }
-      .stage svg, .stage canvas { height: 230px; }
-      .turbo-metrics { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } .turbo-body { grid-template-columns: 1fr; } .turbo-panel { border-right: none; border-bottom: 1px solid var(--border); } .turbo-metrics { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 768px) { header { grid-template-columns: 1fr; padding: 48px 20px 32px; } .header-right { text-align: left; } .container { padding: 24px 16px 48px; } .controls { grid-template-columns: 1fr; } .stage svg, .stage canvas { height: 270px; } .turbo-stage svg { height: 250px; } .metrics { grid-template-columns: 1fr; } .legend-strip { padding: 16px 20px; flex-wrap: wrap; } }
+    @media (max-width: 480px) { header h1 { font-size: 2rem; } .card-header { padding: 18px 16px 0; } .controls { margin: 16px 16px 0; } .stage { margin: 16px 16px 16px; } .stage svg, .stage canvas { height: 230px; } .turbo-metrics { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- ══ HEADER ══ -->
   <header>
     <div class="header-left">
       <div class="eyebrow">Portfolio interactif · Master MAM</div>
@@ -425,7 +151,6 @@
     </div>
   </header>
 
-  <!-- ══ LEGEND ══ -->
   <div class="legend-strip">
     <span class="legend-label">Intensité</span>
     <div style="flex:1">
@@ -436,8 +161,6 @@
 
   <main class="container">
 
-    <div class="section-title"><h3>Mécanique des structures</h3></div>
-
     <section class="grid">
 
       <!-- 1. TRACTION -->
@@ -445,13 +168,13 @@
         <div class="card-header">
           <div class="card-num">Module 01 · FEA</div>
           <h2>Traction axiale d'une plaque</h2>
-          <p>Plaque encastrée sous traction axiale. La carte de couleur montre la distribution des contraintes. L'effet de Poisson contracte le profil latéralement.</p>
+          <p>Plaque encastrée sous traction axiale. La contrainte est uniforme sur toute la plaque (σ = F/A). La concentration à l'encastrement suit le principe de Saint-Venant. L'effet de Poisson contracte le profil latéralement.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Force appliquée <span id="tractionForceValue">45 kN</span></label><input id="tractionForce" type="range" min="5" max="100" value="45"/></div>
+          <div class="control"><label>Force appliquée <span id="tractionForceValue">45 kN</span></label><input id="tractionForce" type="range" min="5" max="100" value="90"/></div>
           <div class="control"><label>Coeff. Poisson ν <span id="tractionPoissonValue">0.30</span></label><input id="tractionPoisson" type="range" min="0" max="0.45" step="0.01" value="0.30"/></div>
-          <div class="control"><label>Épaisseur <span id="tractionThicknessValue">18 mm</span></label><input id="tractionThickness" type="range" min="8" max="30" value="18"/></div>
-          <div class="control"><label>Rigidité <span id="tractionStiffnessValue">60</span></label><input id="tractionStiffness" type="range" min="20" max="100" value="60"/></div>
+          <div class="control"><label>Épaisseur <span id="tractionThicknessValue">18 mm</span></label><input id="tractionThickness" type="range" min="8" max="30" value="10"/></div>
+          <div class="control"><label>Module E <span id="tractionStiffnessValue">60</span></label><input id="tractionStiffness" type="range" min="20" max="100" value="60"/></div>
         </div>
         <div class="stage">
           <svg id="tractionSvg" viewBox="0 0 700 320"></svg>
@@ -468,7 +191,7 @@
         <div class="card-header">
           <div class="card-num">Module 02 · FEA</div>
           <h2>Flexion d'une poutre</h2>
-          <p>Poutre bi-appuyée chargée en son centre. La flèche varie en L³/EI. La carte thermique révèle la concentration des contraintes en fibre externe.</p>
+          <p>Poutre bi-appuyée chargée en son centre. La flèche varie en L³/EI. La carte thermique montre σ(y) = M·y/I — rouge en fibre externe, bleu à la fibre neutre.</p>
         </div>
         <div class="controls">
           <div class="control"><label>Charge centrale <span id="beamLoadValue">30 kN</span></label><input id="beamLoad" type="range" min="5" max="80" value="30"/></div>
@@ -481,7 +204,7 @@
           <div class="metrics">
             <div class="metric"><span>Flèche max</span><strong id="beamDeflection">0 mm</strong></div>
             <div class="metric"><span>Moment max</span><strong id="beamMoment">0 kN·m</strong></div>
-            <div class="metric"><span>Niveau</span><strong id="beamCritical">Faible</strong></div>
+            <div class="metric"><span>σ max fibre</span><strong id="beamCritical">Faible</strong></div>
           </div>
         </div>
       </article>
@@ -519,13 +242,13 @@
         <div class="controls">
           <div class="control"><label>Dents — moteur <span id="gear1TeethValue">18</span></label><input id="gear1Teeth" type="range" min="10" max="40" value="18"/></div>
           <div class="control"><label>Dents — récepteur <span id="gear2TeethValue">36</span></label><input id="gear2Teeth" type="range" min="12" max="80" value="36"/></div>
-          <div class="control"><label>Vitesse d'entrée <span id="gearSpeedValue">180 rpm</span></label><input id="gearSpeed" type="range" min="60" max="600" value="180"/></div>
+          <div class="control"><label>Couple moteur T₁ <span id="gearTorqueInValue">50 N·m</span></label><input id="gearTorqueIn" type="range" min="10" max="500" step="5" value="50"/></div>
         </div>
         <div class="stage">
           <svg id="gearSvg" viewBox="0 0 700 320"></svg>
           <div class="metrics">
             <div class="metric"><span>Réduction</span><strong id="gearRatio">0</strong></div>
-            <div class="metric"><span>Vitesse sortie</span><strong id="gearOutput">0 rpm</strong></div>
+            <div class="metric"><span>Rendement η</span><strong id="gearOutput">97 %</strong></div>
             <div class="metric"><span>Couple sortie</span><strong id="gearTorqueOut">0 N·m</strong></div>
           </div>
         </div>
@@ -536,20 +259,18 @@
         <div class="card-header">
           <div class="card-num">Module 05 · Contact</div>
           <h2>Roulement avec et sans glissement</h2>
-          <p>Contact roue-sol selon Bekker. Quand la vitesse de jante diffère de la vitesse d'avance, un glissement apparaît — le frottement détermine l'empreinte et l'intensité des traces.</p>
+          <p>Contact roue-sol — modèle Bekker. Le taux de glissement i = (ω·r − v)/ω·r compare la vitesse théorique de la roue à la vitesse réelle d'avance du robot. Roulement pur si v = ω·r.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Vitesse translation <span id="rollSpeedValue">3.0 m/s</span></label><input id="rollSpeed" type="range" min="0.5" max="8" step="0.1" value="3"/></div>
+          <div class="control"><label>Vitesse translation <span id="rollSpeedValue">3.0 m/s</span></label><input id="rollSpeed" type="range" min="0.5" max="8" step="0.1" value="5"/></div>
           <div class="control"><label>Vitesse angulaire <span id="rollOmegaValue">6.0 rad/s</span></label><input id="rollOmega" type="range" min="1" max="16" step="0.1" value="6"/></div>
           <div class="control"><label>Rayon roue <span id="rollRadiusValue">0.50 m</span></label><input id="rollRadius" type="range" min="0.2" max="1.0" step="0.01" value="0.5"/></div>
-          <div class="control"><label>Coeff. frottement <span id="rollFrictionValue">0.45</span></label><input id="rollFriction" type="range" min="0.05" max="1" step="0.01" value="0.45"/></div>
         </div>
         <div class="stage">
           <svg id="rollSvg" viewBox="0 0 700 320"></svg>
-          <div class="metrics">
-            <div class="metric"><span>Glissement</span><strong id="rollSlip">0 %</strong></div>
+          <div class="metrics" style="grid-template-columns:repeat(2,1fr)">
+            <div class="metric"><span>Glissement i</span><strong id="rollSlip">0 %</strong></div>
             <div class="metric"><span>Régime</span><strong id="rollMode">Roulement pur</strong></div>
-            <div class="metric"><span>Lecture</span><strong>Empreinte + traces</strong></div>
           </div>
         </div>
       </article>
@@ -578,8 +299,6 @@
       </article>
 
     </section>
-
-    <div class="section-title" style="margin-top: 12px;"><h3>Turbomachines</h3></div>
 
     <section class="grid">
 
@@ -650,17 +369,11 @@
 </div>
 
 <script>
-/* ════════════════════════════════════════════════
-   SCROLL REVEAL
-════════════════════════════════════════════════ */
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
 }, { threshold: 0.06 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-/* ════════════════════════════════════════════════
-   UTILITIES  (physique inchangée)
-════════════════════════════════════════════════ */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const colorMap=t=>{
   const c1=[29,78,216],c2=[34,211,238],c3=[250,204,21],c4=[249,115,22],c5=[220,38,38];
@@ -680,7 +393,6 @@ function bv(id,fmt=v=>v){
   return inp;
 }
 
-/* ── SVG background helper ── */
 function svgBg(w=700, h=320) {
   let g = '';
   for(let i=0;i<=10;i++) g+=`<line x1="${i*w/10}" y1="0" x2="${i*w/10}" y2="${h}" stroke="rgba(255,255,255,0.028)" stroke-width="1"/>`;
@@ -689,24 +401,39 @@ function svgBg(w=700, h=320) {
 }
 
 /* ══════════════════════════════════
-   1. TRACTION
+   1. TRACTION — CORRIGÉ
+   Physique : σ = F/A uniforme partout
+   Seule variation : concentration Saint-Venant à l'encastrement (x=0)
 ══════════════════════════════════ */
 const tractionForce=bv('tractionForce',v=>`${v} kN`);
 const tractionPoisson=bv('tractionPoisson',v=>Number(v).toFixed(2));
 const tractionThickness=bv('tractionThickness',v=>`${v} mm`);
-const tractionStiffness=bv('tractionStiffness',v=>`${v}`);
+const tractionStiffness=bv('tractionStiffness',v=>`${v} GPa`);
 function drawTraction(){
   const svg=document.getElementById('tractionSvg');
   const force=+tractionForce.value,nu=+tractionPoisson.value,thick=+tractionThickness.value,stiff=+tractionStiffness.value;
-  const young=stiff*3.2,strain=force/Math.max(young*thick*22,1),disp=strain*520,stress=(force*12)/thick;
-  document.getElementById('tractionDisp').textContent=`${disp.toFixed(2)} mm`;
+  // Physique correcte : σ = F/A,  δ = σL/E
+  // b=50mm (largeur fixe), L=300mm (longueur fixe), E=stiff GPa directement
+  const b_mm=50, L_mm=300;
+  const E_MPa=stiff*1000;                 // GPa → MPa
+  const F_N=force*1000;                   // kN → N
+  const A_mm2=thick*b_mm;                 // section mm²
+  const stress=F_N/A_mm2;                 // σ = F/A  [MPa]
+  const disp=(stress/E_MPa)*L_mm;         // δ = (σ/E)·L  [mm]
+  document.getElementById('tractionDisp').textContent=`${disp.toFixed(3)} mm`;
   document.getElementById('tractionStress').textContent=`${stress.toFixed(1)} MPa`;
   let rects='';const cols=36,rows=11,x0=110,y0=72,w=430,h=136;
   const axialAmp=clamp(disp*12.5,8,62),lateralAmp=clamp(axialAmp*nu*.58,0,16);
   for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
     const xn=i/(cols-1),yn=j/(rows-1),xShift=axialAmp*xn;
     const lhh=h*.5-lateralAmp*xn,yc=y0+h*.5,y=yc+(yn-.5)*2*lhh;
-    const local=clamp(.14+.78*xn+.06*Math.abs(yn-.5),0,1);
+    // σ_ref fixe = F_max / A_min (épaisseur_min=8mm, b=50mm)
+    const sigma = F_N / A_mm2;
+    const sigma_ref = 100000 / (8 * 50);  // 250 MPa — référence fixe
+    const base = clamp(sigma / sigma_ref, 0, 1);
+    // Saint-Venant à l'encastrement × intensité de la contrainte
+    const saintVenant = 1.0 + 1.5 * Math.exp(-6.0 * xn);
+    const local = clamp(base * saintVenant, 0, 1);
     const x=x0+i*(w/cols)+xShift;
     rects+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(w/cols+.9).toFixed(1)}" height="${(2*lhh/rows+.9).toFixed(1)}" fill="${colorMap(local)}" opacity=".92"/>`;
   }
@@ -718,11 +445,15 @@ function drawTraction(){
   ${rects}
   <line x1="${fX}" y1="${cY}" x2="${fX+aL}" y2="${cY}" stroke="#e74c3c" stroke-width="5" marker-end="url(#ah)"/>
   <text x="${fX+18}" y="${cY-22}" fill="#e74c3c" font-size="15" font-family="Space Mono,monospace">F = ${force} kN</text>
-  <text x="60" y="298" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">Allongement axial · contraction transversale (effet de Poisson)</text>`;
+  <text x="60" y="298" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">σ=F/A [MPa] · δ=σL/E [mm] · b=50mm, L=300mm · pic Saint-Venant à l'encastrement</text>`;
 }
 
 /* ══════════════════════════════════
-   2. FLEXION
+   2. FLEXION — CORRIGÉ
+   Physique : σ(y) = M(x)·y/I
+   Colormap selon y dans la hauteur de section :
+     fibre externe → rouge  (|y| max)
+     fibre neutre  → bleu   (y = 0)
 ══════════════════════════════════ */
 const beamLoad=bv('beamLoad',v=>`${v} kN`);
 const beamSpan=bv('beamSpan',v=>`${Number(v).toFixed(1)} m`);
@@ -731,24 +462,51 @@ const beamYoung=bv('beamYoung',v=>`${v} GPa`);
 function drawBeam(){
   const svg=document.getElementById('beamSvg');
   const P=+beamLoad.value,L=+beamSpan.value,h=+beamHeight.value,E=+beamYoung.value;
-  const delta=(P*Math.pow(L,3))/(E*Math.pow(h/100,3)*20),M=(P*L)/4;
-  const effortLevel=clamp((P/80)*(4.5/L)*(220/h)*(120/E),0,1);
+  // Physique correcte : section rectangulaire b=80mm fixe
+  // δ = PL³/48EI,  M = PL/4,  σ_max = M·(h/2)/I
+  const b_m=0.080;                                   // largeur section 80mm fixe
+  const h_m=h/1000;                                  // mm → m
+  const I=b_m*Math.pow(h_m,3)/12;                   // inertie m⁴
+  const E_Pa=E*1e9;                                  // GPa → Pa
+  const P_N=P*1000;                                  // kN → N
+  const delta=(P_N*Math.pow(L,3))/(48*E_Pa*I)*1000; // δ [mm]
+  const M=(P*L)/4;                                   // M = PL/4 [kN·m]
+  const sigma_max=(M*1e6*(h/2))/(I*1e12);           // σ_max [MPa]
+  const sigma_adm=250;                               // acier courant [MPa]
+  const effortLevel=clamp(sigma_max/sigma_adm,0,1); // normalisé sur σ_adm
   document.getElementById('beamDeflection').textContent=`${delta.toFixed(2)} mm`;
   document.getElementById('beamMoment').textContent=`${M.toFixed(1)} kN·m`;
   const sX=80,eX=620,bY=135,amp=clamp(delta*10,12,95);
   let path=`M ${sX} ${bY}`,bands='',glowBands='',grid='';
   for(let i=0;i<=80;i++){const t=i/80,x=sX+(eX-sX)*t,y=bY+amp*Math.sin(Math.PI*t);path+=` L ${x.toFixed(2)} ${y.toFixed(2)}`;}
   for(let i=0;i<=12;i++)grid+=`<line x1="34" y1="${54+i*18}" x2="666" y2="${54+i*18}" stroke="rgba(255,255,255,.025)" stroke-width="1"/>`;
+
+  // ── CORRECTION : couches de couleur par hauteur de section (σ(y) = M·y/I)
   for(let i=0;i<44;i++){
     const t=i/43,x=sX+(eX-sX)*t,ss=Math.sin(Math.PI*t);
-    const level=clamp(.18+.82*ss*(.45+effortLevel*.75),0,1),c=colorMap(level);
     const y=bY+amp*Math.sin(Math.PI*t),lh=18+effortLevel*14+ss*10;
-    bands+=`<rect x="${x-7}" y="${y-lh/2}" width="16" height="${lh.toFixed(1)}" fill="${c}" rx="4" opacity=".94"/>`;
-    glowBands+=`<rect x="${x-11}" y="${y-lh/2-4}" width="24" height="${(lh+8).toFixed(1)}" fill="${c}" rx="7" opacity="${(.05+.10*effortLevel).toFixed(2)}"/>`;
+    // Diviser la hauteur de section en nL couches
+    const nL=10;
+    for(let k=0;k<nL;k++){
+      const yn=k/(nL-1);           // 0=haut, 1=bas (fibres externes aux deux extrémités)
+      // Distance à la fibre neutre (yn=0.5) — max en externe (yn=0 ou 1)
+      const distNeutre = Math.abs(yn - 0.5) * 2; // 0 au neutre, 1 en fibre externe
+      // M(x) est max au centre de la portée (ss=1), nul aux appuis (ss=0)
+      const momentFactor = ss * (0.45 + effortLevel * 0.75);
+      const level = clamp(0.05 + distNeutre * momentFactor * 0.95, 0, 1);
+      const c = colorMap(level);
+      const lh2 = lh / nL;
+      const ky = y - lh/2 + k * lh2;
+      bands += `<rect x="${(x-7).toFixed(1)}" y="${ky.toFixed(1)}" width="16" height="${(lh2+0.5).toFixed(1)}" fill="${c}" rx="2" opacity=".94"/>`;
+      // Glow uniquement sur les fibres externes
+      if(k===0||k===nL-1)
+        glowBands += `<rect x="${(x-11).toFixed(1)}" y="${(ky-2).toFixed(1)}" width="24" height="${(lh2+4).toFixed(1)}" fill="${c}" rx="4" opacity="${(0.04+0.09*effortLevel).toFixed(2)}"/>`;
+    }
   }
+
   const bt=colorMap(clamp(.22+effortLevel*.78,0,1));
   const ct=effortLevel<.32?'Faible':effortLevel<.62?'Modéré':effortLevel<.85?'Élevé':'Critique';
-  document.getElementById('beamCritical').textContent=ct;
+  document.getElementById('beamCritical').textContent=`${sigma_max.toFixed(1)} MPa`;
   svg.innerHTML=`<defs>
     <linearGradient id="bStroke" x1="0" x2="1">
       <stop offset="0%" stop-color="${colorMap(clamp(.10+effortLevel*.25,0,1))}"/>
@@ -768,7 +526,7 @@ function drawBeam(){
   <line x1="350" y1="35" x2="350" y2="105" stroke="#e74c3c" stroke-width="4"/>
   <polygon points="340,98 360,98 350,116" fill="#e74c3c"/>
   <text x="318" y="28" fill="#e74c3c" font-size="13" font-family="Space Mono,monospace">P = ${P} kN</text>
-  <text x="85" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">La flèche varie en L³ — doubler la portée multiplie la déformation par 8.</text>`;
+  <text x="85" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">δ=PL³/48EI · σ_max=M(h/2)/I · b=80mm · rouge=fibre externe, bleu=fibre neutre</text>`;
 }
 
 /* ══════════════════════════════════
@@ -778,7 +536,6 @@ const cfdSpeed=bv('cfdSpeed',v=>`${Number(v).toFixed(1)} m/s`);
 const cfdViscosity=bv('cfdViscosity',v=>`${v}`);
 const cfdObstacle=bv('cfdObstacle',v=>`${v} mm`);
 const cfdTurbulence=bv('cfdTurbulence',v=>`${v}`);
-/* ── CFD particles persistent state ── */
 const cfdPts=[];
 (function(){for(let i=0;i<34;i++)cfdPts.push({x:(i/34)*700,yn:0.06+Math.random()*0.88});})();
 
@@ -787,11 +544,8 @@ function drawCFD(ts){
   if(!svg)return;
   const flow=+cfdSpeed.value,neck=+cfdViscosity.value,chH=+cfdObstacle.value,mix=+cfdTurbulence.value;
   const W=700,H=340;
-  /* jet scientifique : bleu→cyan→vert→jaune→rouge
-     neck grand (canal large) → écart de vitesse faible → couleurs restent dans le bleu
-     neck petit (fort rétrécissement) → écart de vitesse élevé → tout le spectre jusqu'au rouge */
-  const neckNorm=clamp(neck/10,0,1); /* 0=rétrécissement faible, 1=fort */
-  const colorRange=0.15+0.85*neckNorm; /* plage de couleur utilisée : 0.15 (tout bleu) → 1.0 (bleu→rouge) */
+  const neckNorm=clamp(neck/10,0,1);
+  const colorRange=0.15+0.85*neckNorm;
   const cfdColorMap=t=>{
     const ts=clamp(t*colorRange,0,1);
     const mx=(a,b,u)=>a.map((x,i)=>Math.round(x+(b[i]-x)*u));
@@ -810,25 +564,24 @@ function drawCFD(ts){
   const velAt=(x,yn)=>{const g=gapY(x),cb=1-Math.pow(clamp(2*yn-1,-1,1),2);return flow*(0.5+cb)*(2*entryHalf)/Math.max(g,12);};
   const vmax=flow*(2*entryHalf)/Math.max(2*throatHalf,12);
   const ratio=vmax/Math.max(flow,0.01);
-  const neckPct=Math.round((1-throatHalf/entryHalf)*100);
+  // Re = ρ·V·D_h / μ  —  D_h = 2×entryHalf (en mm → m), μ = mix×1e-3 Pa·s
+  const rho_eau=1000, D_h=(2*entryHalf)/1000;
+  const mu_Pa=mix*0.1;  // 0.1–1.0 Pa·s → Re couvre turbulent→laminaire
+  const Re=Math.round(rho_eau*vmax*D_h/mu_Pa);  // utilise vmax au col
+  const regiме=Re<2300?'Laminaire':Re<4000?'Transitoire':'Turbulent';
+  const agitation = mix;
   document.getElementById('cfdRe').textContent=`${vmax.toFixed(1)} m/s`;
   document.getElementById('cfdWake').textContent=`${ratio.toFixed(2)}×`;
-  document.getElementById('cfdNeck').textContent=`${neckPct} %`;
-
-  /* parois — polygones SVG */
+  document.getElementById('cfdNeck').textContent=`${Math.round((1-throatHalf/entryHalf)*100)} %`;
   let topPts=`0,0`,botPts=`0,${H}`;
   for(let x=0;x<=W;x+=6){topPts+=` ${x},${topY(x).toFixed(1)}`;botPts+=` ${x},${botY(x).toFixed(1)}`;}
   topPts+=` ${W},0`;botPts+=` ${W},${H}`;
-
-  /* paroi path (ligne nette) */
   let topLine='',botLine='';
   for(let x=0;x<=W;x+=4){
     const yt=topY(x).toFixed(1),yb=botY(x).toFixed(1);
     topLine+=(x===0?`M 0 ${yt}`:`L ${x} ${yt}`);
     botLine+=(x===0?`M 0 ${yb}`:`L ${x} ${yb}`);
   }
-
-  /* lignes de courant SVG */
   const NL=13;
   let streamlines='';
   for(let j=0;j<NL;j++){
@@ -838,28 +591,25 @@ function drawCFD(ts){
     let pts='';
     for(let x=0;x<=W;x+=6){
       const tw=topY(x),gap=gapY(x);
-      const wave=Math.sin(x*0.026+(ts||0)*0.00055*flow+j*1.15)*mix*0.55;
+      const wave=Math.sin(x*0.026+(ts||0)*0.00055*flow+j*1.15)*agitation*0.55;
       const y=(tw+yn*gap+wave).toFixed(1);
       pts+=(x===0?`M 0 ${y}`:`L ${x} ${y}`);
     }
     streamlines+=`<path d="${pts}" fill="none" stroke="${col}" stroke-width="1.7" opacity="0.82"/>`;
   }
-
-  /* particules */
   const dt=0.016;
   let circles='';
   for(const p of cfdPts){
     const tw=topY(p.x),gap=gapY(p.x);
     const v=velAt(p.x,p.yn);
     p.x+=v*dt*13;
-    p.yn=clamp(p.yn+(Math.random()-0.5)*mix*0.011,0.05,0.95);
+    p.yn=clamp(p.yn+(Math.random()-0.5)*agitation*0.011,0.05,0.95);
     if(p.x>W+4)p.x=0;
     const py=tw+p.yn*gap;
     if(py<tw+2||py>botY(p.x)-2)continue;
     const col=cfdColorMap(clamp(v/(flow*5.2),0,1));
     circles+=`<circle cx="${p.x.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="${col}" opacity="0.9"/>`;
   }
-
   svg.innerHTML=`<defs>
     <linearGradient id="cfdLg" x1="0" x2="1"><stop offset="0%" stop-color="rgb(29,78,216)"/><stop offset="25%" stop-color="rgb(34,211,238)"/><stop offset="50%" stop-color="rgb(250,204,21)"/><stop offset="75%" stop-color="rgb(249,115,22)"/><stop offset="100%" stop-color="rgb(220,38,38)"/></linearGradient>
     <clipPath id="cfdClip"><polygon points="${topPts}" clip-rule="evenodd"/></clipPath>
@@ -886,7 +636,7 @@ function drawCFD(ts){
 ══════════════════════════════════ */
 const gear1Teeth=bv('gear1Teeth',v=>`${v}`);
 const gear2Teeth=bv('gear2Teeth',v=>`${v}`);
-const gearSpeed=bv('gearSpeed',v=>`${v} rpm`);
+const gearTorqueIn=bv('gearTorqueIn',v=>`${v} N·m`);
 function gearPath(cx,cy,r,teeth,phase){
   let d='';const total=teeth*2;
   for(let i=0;i<=total;i++){const a=phase+(i/total)*Math.PI*2,rr=i%2===0?r*1.12:r*.9,x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);d+=i===0?`M ${x} ${y}`:`  L ${x} ${y}`;}
@@ -894,14 +644,15 @@ function gearPath(cx,cy,r,teeth,phase){
 }
 function drawGears(){
   const svg=document.getElementById('gearSvg');
-  const z1=+gear1Teeth.value,z2=+gear2Teeth.value,n1=+gearSpeed.value;
-  const ratio=z1/z2,out=n1*ratio;
-  const T1=50,T2=T1/ratio;
+  const z1=+gear1Teeth.value,z2=+gear2Teeth.value;
+  const ratio=z1/z2;
+  const T1=+gearTorqueIn.value;
+  const eta=0.97;
+  const T2=T1*(z2/z1)*eta;
   document.getElementById('gearRatio').textContent=`1 : ${(1/ratio).toFixed(2)}`;
-  document.getElementById('gearOutput').textContent=`${out.toFixed(1)} rpm`;
+  document.getElementById('gearOutput').textContent=`97 %`;
   document.getElementById('gearTorqueOut').textContent=`${T2.toFixed(1)} N·m`;
   const r1=45+z1*1.4,r2=45+z2*1.0,c1x=215,c2x=215+r1+r2-10,cy=158,phase=Date.now()/800;
-  // Glow
   svg.innerHTML=`
   <defs>
     <radialGradient id="g1g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(232,232,232,0.18)"/><stop offset="100%" stop-color="rgba(232,232,232,0)"/></radialGradient>
@@ -930,25 +681,34 @@ function drawGears(){
 const rollSpeed=bv('rollSpeed',v=>`${Number(v).toFixed(1)} m/s`);
 const rollOmega=bv('rollOmega',v=>`${Number(v).toFixed(1)} rad/s`);
 const rollRadius=bv('rollRadius',v=>`${Number(v).toFixed(2)} m`);
-const rollFriction=bv('rollFriction',v=>`${Number(v).toFixed(2)}`);
 function drawRolling(){
   const svg=document.getElementById('rollSvg');
-  const v=+rollSpeed.value,omega=+rollOmega.value,r=+rollRadius.value,mu=+rollFriction.value;
-  const ideal=omega*r,rawSlip=Math.abs(v-ideal)/Math.max(v,ideal,.001),effSlip=rawSlip*(1.2-.55*mu),slipPct=effSlip*100;
-  const mode=v<=ideal?(effSlip<.08?'Accélération — roulement pur':'Accélération + glissement'):(effSlip<.08?'Freinage — roulement pur':'Freinage + glissement');
+  const v=+rollSpeed.value,omega=+rollOmega.value,r=+rollRadius.value;
+  const ideal=omega*r;
+  // Glissement cinématique SAE
+  // Traction (v < ωr) : i = (ωr - v) / (ωr)
+  // Freinage (v > ωr) : i = (v - ωr) / v
+  const iSlip = v<=ideal
+    ? (ideal-v)/Math.max(ideal,0.001)
+    : (v-ideal)/Math.max(v,0.001);
+  const slipPct=iSlip*100;
+  const isPatinage=iSlip>0.15;
+  const mode=v<=ideal
+    ? (iSlip<0.01?'Accélération — roulement pur':'Accélération + glissement')
+    : (iSlip<0.01?'Freinage — roulement pur':'Freinage + glissement');
   document.getElementById('rollSlip').textContent=`${slipPct.toFixed(1)} %`;
   document.getElementById('rollMode').textContent=mode;
+  const skidDir=v>=ideal?1:-1;
   const rPx=60+r*40,cx=250,cy=148,gY=cy+rPx+15,angle=Date.now()/500*omega*.2;
-  const sink=6+effSlip*20*(1.08-mu*.35),traceScale=effSlip*(1.2-mu*.3),patchW=rPx*(.42+mu*.28),skidDir=v>=ideal?1:-1;
+  const patchW=rPx*0.42, sink=6+iSlip*20, traceScale=iSlip;
   let traces='';
   for(let i=0;i<24;i++){const tx=cx-i*(16+traceScale*8)*skidDir,fade=1-i/24,depth=2+traceScale*16*fade;traces+=`<ellipse cx="${tx}" cy="${gY+2}" rx="${8+depth}" ry="${2.4+depth*.36}" fill="rgba(230,210,175,${((.18+traceScale*.60)*fade).toFixed(3)})"/>`;}
   let particles='';
-  if(effSlip>.12)for(let i=0;i<10;i++){const px=cx-skidDir*(8+Math.random()*42),py=gY-Math.random()*(8+effSlip*24),pr=1.2+Math.random()*1.8;particles+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="rgba(240,225,195,${(.55+effSlip*.45).toFixed(2)})"/>`;}
+  if(iSlip>.08)for(let i=0;i<10;i++){const px=cx-skidDir*(8+Math.random()*42),py=gY-Math.random()*(8+iSlip*24),pr=1.2+Math.random()*1.8;particles+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${pr.toFixed(1)}" fill="rgba(240,225,195,${(.55+iSlip*.45).toFixed(2)})"/>`;}
   svg.innerHTML=`
   <defs>
     <linearGradient id="gg2" x1="0" x2="1"><stop offset="0%" stop-color="rgba(30,34,40,0.98)"/><stop offset="100%" stop-color="rgba(24,27,32,0.98)"/></linearGradient>
     <radialGradient id="wheelGrad" cx="40%" cy="38%" r="62%"><stop offset="0%" stop-color="rgba(232,232,232,0.20)"/><stop offset="100%" stop-color="rgba(232,232,232,0)"/></radialGradient>
-    <filter id="rglow"><feGaussianBlur stdDeviation="6"/></filter>
   </defs>
   ${svgBg(700,320)}
   <rect x="0" y="${gY}" width="700" height="80" fill="url(#gg2)"/>
@@ -963,11 +723,7 @@ function drawRolling(){
   <line x1="${cx-120}" y1="${cy-62}" x2="${cx-20}" y2="${cy-62}" stroke="#e74c3c" stroke-width="4"/>
   <polygon points="${cx-20},${cy-62} ${cx-34},${cy-70} ${cx-34},${cy-54}" fill="#e74c3c"/>
   <text x="${cx-138}" y="${cy-72}" fill="#e74c3c" font-size="12" font-family="Space Mono,monospace">v = ${v.toFixed(1)} m/s</text>
-  <rect x="468" y="38" width="192" height="96" rx="10" fill="rgba(12,13,15,0.90)" stroke="rgba(255,255,255,.07)"/>
-  <text x="484" y="62" fill="#eceef2" font-size="13" font-family="Space Mono,monospace">μ = ${mu.toFixed(2)}</text>
-  <text x="484" y="84" fill="#7a808c" font-size="12" font-family="Space Mono,monospace">slip : ${slipPct.toFixed(1)} %</text>
-  <text x="484" y="106" fill="#fbbf24" font-size="11" font-family="DM Sans,sans-serif">${mode.split(' — ')[0]}</text>
-  <text x="36" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">L'empreinte de contact s'élargit avec μ · les traces révèlent l'intensité du glissement.</text>`;
+  <text x="36" y="306" fill="#3a3f48" font-size="12" font-family="DM Sans,sans-serif">i = (ωr−v)/ωr · les traces révèlent l'intensité du glissement</text>`;
   requestAnimationFrame(drawRolling);
 }
 
@@ -998,14 +754,8 @@ function drawWing(){
   const topPS=deepLow?.90:isStall?.76:clamp(.24+.56*speedLevel+.018*Math.max(0,aoa),.24,.94);
   const botPS=deepLow?.22:isStall?.58:clamp(.26+.30*speedLevel+.15*Math.max(0,aoa/10),.24,.82);
   const preStall=aoa>stallAngle-2&&!isStall;
-  /* Physique pression : chaud=haute pression, froid=basse pression
-     Normal    : extrados (haut) = basse pression → bleu cyan  / intrados (bas) = haute pression → rouge orange
-     Pré-décroch: extrados = très basse pression → bleu vif   / intrados = pression élevée → orange
-     Décrochage : extrados = pression effondrée → violet froid / intrados = pression désorganisée → jaune trouble
-     Inversé    : extrados = haute pression → rouge            / intrados = basse pression → bleu */
   const topColor=deepLow?'#f97316':isStall?'#38bdf8':preStall?'#38bdf8':'#e8e8e8';
   const botColor=deepLow?'#38bdf8':isStall?'#fbbf24':preStall?'#fb923c':'#f97316';
-  const liftColor=cl>=0?'#f97316':'#38bdf8';
   const auraColor=deepLow?'rgba(249,115,22,.15)':isStall?'rgba(56,189,248,.15)':preStall?'rgba(56,189,248,.13)':'rgba(232,232,232,.10)';
   const rotate=(x,y)=>({x:cx+x*Math.cos(angle)-y*Math.sin(angle),y:cy+x*Math.sin(angle)+y*Math.cos(angle)});
   let profile='';const uP=[],lP=[];
@@ -1078,7 +828,7 @@ let wingStarted=false;
 function startWing(){if(wingStarted)return;wingStarted=true;const l=()=>{drawWing();requestAnimationFrame(l);};l();}
 
 /* ══════════════════════════════════
-   TURBOMACHINES (physics unchanged)
+   TURBOMACHINES
 ══════════════════════════════════ */
 const g=9.81;
 function bvT(id,fmt){const inp=document.getElementById(id);const out=document.getElementById(id+'Value');const u=()=>{out.innerHTML=fmt(inp.value);};inp.addEventListener('input',u);u();}
@@ -1223,7 +973,6 @@ function makeTurbineParticles(t,cx,cy,impellerR,count){
       pts+=(k===0?`M ${px.toFixed(1)} ${py.toFixed(1)}`:`L ${px.toFixed(1)} ${py.toFixed(1)}`);
     }
     out+=`<path d="${pts}" fill="none" stroke="rgba(231,76,60,0.10)" stroke-width="1.5"/>`;
-    const xExit=cx+impellerR+30;
     out+=`<line x1="${cx}" y1="${(cy+(i-2.5)*13).toFixed(1)}" x2="${cx+impellerR+200}" y2="${(cy+(i-2.5)*13).toFixed(1)}" stroke="rgba(231,76,60,0.10)" stroke-width="1.5"/>`;
   }
   for(let i=0;i<count;i++){
@@ -1296,8 +1045,8 @@ function fullUpdate(){drawTraction();drawBeam();drawCFD();}
 ['tractionForce','tractionPoisson','tractionThickness','tractionStiffness',
  'beamLoad','beamSpan','beamHeight','beamYoung',
  'cfdSpeed','cfdViscosity','cfdObstacle','cfdTurbulence',
- 'gear1Teeth','gear2Teeth','gearSpeed',
- 'rollSpeed','rollOmega','rollRadius','rollFriction',
+ 'gear1Teeth','gear2Teeth','gearTorqueIn',
+ 'rollSpeed','rollOmega','rollRadius',
  'wingSpeed','wingAoA','wingCamber','wingArea'
 ].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',fullUpdate);});
 ['pumpSpeed','pumpFlow','pumpRadius','pumpAngle'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>drawPump(performance.now()));});
