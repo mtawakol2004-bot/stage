@@ -194,9 +194,9 @@
           <p>Poutre bi-appuyée chargée en son centre. La flèche varie en L³/EI. La carte thermique montre σ(y) = M·y/I — rouge en fibre externe, bleu à la fibre neutre.</p>
         </div>
         <div class="controls">
-          <div class="control"><label>Charge centrale <span id="beamLoadValue">30 kN</span></label><input id="beamLoad" type="range" min="5" max="80" value="30"/></div>
-          <div class="control"><label>Portée <span id="beamSpanValue">4.0 m</span></label><input id="beamSpan" type="range" min="2" max="8" step="0.1" value="4"/></div>
-          <div class="control"><label>Hauteur section <span id="beamHeightValue">220 mm</span></label><input id="beamHeight" type="range" min="120" max="400" value="220"/></div>
+          <div class="control"><label>Charge centrale <span id="beamLoadValue">30 kN</span></label><input id="beamLoad" type="range" min="5" max="80" value="80"/></div>
+          <div class="control"><label>Portée <span id="beamSpanValue">4.0 m</span></label><input id="beamSpan" type="range" min="2" max="8" step="0.1" value="3"/></div>
+          <div class="control"><label>Hauteur section <span id="beamHeightValue">220 mm</span></label><input id="beamHeight" type="range" min="120" max="400" value="150"/></div>
           <div class="control"><label>Module Young <span id="beamYoungValue">75 GPa</span></label><input id="beamYoung" type="range" min="20" max="210" value="75"/></div>
         </div>
         <div class="stage">
@@ -259,7 +259,7 @@
         <div class="card-header">
           <div class="card-num">Module 05 · Contact</div>
           <h2>Roulement avec et sans glissement</h2>
-          <p>Contact roue-sol — modèle Bekker. Le taux de glissement i = (ω·r − v)/ω·r compare la vitesse théorique de la roue à la vitesse réelle d'avance du robot. Roulement pur si v = ω·r.</p>
+          <p>Contact roue-sol. Le taux de glissement i = (ω·r − v)/ω·r compare la vitesse théorique de la roue à la vitesse réelle d'avance du robot. Roulement pur si v = ω·r.</p>
         </div>
         <div class="controls">
           <div class="control"><label>Vitesse translation <span id="rollSpeedValue">3.0 m/s</span></label><input id="rollSpeed" type="range" min="0.5" max="8" step="0.1" value="5"/></div>
@@ -284,7 +284,7 @@
         </div>
         <div class="controls">
           <div class="control"><label>Vitesse écoulement <span id="wingSpeedValue">65 m/s</span></label><input id="wingSpeed" type="range" min="20" max="120" step="1" value="65"/></div>
-          <div class="control"><label>Angle d'attaque <span id="wingAoAValue">8°</span></label><input id="wingAoA" type="range" min="-4" max="20" step="0.5" value="8"/></div>
+          <div class="control"><label>Angle d'attaque <span id="wingAoAValue">8°</span></label><input id="wingAoA" type="range" min="-4" max="20" step="0.5" value="12"/></div>
           <div class="control"><label>Cambrure <span id="wingCamberValue">6 %</span></label><input id="wingCamber" type="range" min="0" max="12" step="0.5" value="6"/></div>
           <div class="control"><label>Surface alaire <span id="wingAreaValue">24 m²</span></label><input id="wingArea" type="range" min="8" max="40" step="1" value="24"/></div>
         </div>
@@ -870,11 +870,11 @@ function computeTurbine(){
   const Cv=0.98,kg=clamp(.72+.022*Z,.78,.96);
   const Rmax=clamp(R,0.15,0.50);
   const u=omega*Rmax;
-  const eta=clamp(.70+.018*Z-.0010*Math.pow(betaDeg-22,2),.65,.90);
   const Hhyd=clamp((u*u)/(1.55*g)+6,3,300);
   const Hhyd2=Math.max(Hhyd,(u/(Cv*0.88))*(u/(Cv*0.88))/(2*g));
   const Vjet2=Cv*Math.sqrt(2*g*Hhyd2);
   const dVu=kg*(Vjet2-u*0.90);
+  const eta=clamp(.70+.018*Z-.0010*Math.pow(betaDeg-22,2),.65,.90);
   const Pu=rho*Q*u*dVu;
   const torque=omega>0?Pu/omega:0;
   return{rpm,qh,R:Rmax,betaDeg,Q,omega,u,Vjet:Vjet2,dVu,Pu,torque,eta,Hhyd:Hhyd2,valid:true};
