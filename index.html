@@ -4,6 +4,22 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TAWAKOL — Ingénierie Numérique · MAM</title>
+
+  <!-- Open Graph / LinkedIn preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mtawakol2004-bot.github.io/stage/" />
+  <meta property="og:title" content="TAWAKOL — Simulations mécaniques & fluides · Master MAM" />
+  <meta property="og:description" content="Portfolio interactif : 8 modules de simulation en temps réel — FEA, CFD, turbomachines, aérodynamique. Université Claude Bernard Lyon 1." />
+  <meta property="og:image" content="https://mtawakol2004-bot.github.io/stage/preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter/X card (also used by some scrapers) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TAWAKOL — Simulations mécaniques & fluides · Master MAM" />
+  <meta name="twitter:description" content="Portfolio interactif : 8 modules de simulation en temps réel — FEA, CFD, turbomachines, aérodynamique." />
+  <meta name="twitter:image" content="https://mtawakol2004-bot.github.io/stage/preview.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -510,9 +526,7 @@ function drawBeam(){
 }
 
 /* ══════════════════════════════════
-   3. CFD — CORRECTIONS :
-   - throatHalf : min 12→4, coeff 3.8→4.8 (vmax débloquée sur toute la plage)
-   - vitesse particules normalisée par vmax (déplacement visuel cohérent)
+   3. CFD
 ══════════════════════════════════ */
 const cfdSpeed=bv('cfdSpeed',v=>`${Number(v).toFixed(1)} m/s`);
 const cfdViscosity=bv('cfdViscosity',v=>`${v}`);
@@ -540,7 +554,6 @@ function drawCFD(ts){
     return `rgb(${col[0]},${col[1]},${col[2]})`;
   };
   const cx=W/2,topBase=38,
-        /* FIX 1 : min 12→4, coeff 3.8→4.8 pour débloquer vmax sur toute la plage */
         throatHalf=clamp(54-neck*4.8,4,54),
         entryHalf=clamp(chH+32,48,132);
   const topY=x=>{const d=Math.abs(x-cx)/155;return topBase+(entryHalf-throatHalf)*Math.exp(-d*d);};
@@ -549,9 +562,6 @@ function drawCFD(ts){
   const velAt=(x,yn)=>{const g=gapY(x),cb=1-Math.pow(clamp(2*yn-1,-1,1),2);return flow*(0.5+cb)*(2*entryHalf)/Math.max(g,12);};
   const vmax=flow*(2*entryHalf)/Math.max(2*throatHalf,12);
   const ratio=vmax/Math.max(flow,0.01);
-  const rho_eau=1000, D_h=(2*entryHalf)/1000;
-  const mu_Pa=mix*0.1;
-  const Re=Math.round(rho_eau*vmax*D_h/mu_Pa);
   const agitation = mix;
   document.getElementById('cfdRe').textContent=`${vmax.toFixed(1)} m/s`;
   document.getElementById('cfdWake').textContent=`${ratio.toFixed(2)}×`;
@@ -585,7 +595,6 @@ function drawCFD(ts){
   for(const p of cfdPts){
     const tw=topY(p.x),gap=gapY(p.x);
     const v=velAt(p.x,p.yn);
-    /* FIX 2 : vitesse visuelle normalisée par vmax — cohérente quelle que soit la physique */
     p.x+=(v/Math.max(flow,1))*dt*55;
     p.yn=clamp(p.yn+(Math.random()-0.5)*agitation*0.011,0.05,0.95);
     if(p.x>W+4)p.x=0;
